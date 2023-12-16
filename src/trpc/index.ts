@@ -1,7 +1,8 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { privateProcedure, publicProcedure, router } from "./trpc";
+import { privateAdminProcedure, publicProcedure, router } from "./trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
+import { z } from "zod";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -29,7 +30,7 @@ export const appRouter = router({
     return { success: true };
   }),
 
-  getUserAuctions: privateProcedure.query(async ({ ctx }) => {
+  getUserAuctions: privateAdminProcedure.query(async ({ ctx }) => {
     const { userId, user } = ctx;
 
     return await db.auction.findMany({
@@ -38,6 +39,22 @@ export const appRouter = router({
       },
     });
   }),
+
+  deleteAuction: privateAdminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+
+      const auction = await db.auction.findFirst({
+        where: { id: input.id, userId },
+      });
+
+      if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
+
+      await db.auction.delete({ where: { id: input.id } });
+
+      return auction;
+    }),
   // ...
 });
 

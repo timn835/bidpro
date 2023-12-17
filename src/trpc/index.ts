@@ -40,6 +40,23 @@ export const appRouter = router({
     });
   }),
 
+  // the following procedure implements polling
+  getImage: privateAdminProcedure
+    .input(z.object({ key: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+      const auction = await db.auction.findFirst({
+        where: {
+          imgKey: input.key,
+          userId,
+        },
+      });
+
+      if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return auction;
+    }),
+
   deleteAuction: privateAdminProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {

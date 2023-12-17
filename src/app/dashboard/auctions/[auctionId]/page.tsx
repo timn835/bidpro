@@ -2,27 +2,28 @@ import AuctionRenderer from "@/components/AuctionRenderer";
 import LotsWrapper from "@/components/LotsWrapper";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 interface PageProps {
   params: {
-    auctionid: string;
+    auctionId: string;
   };
 }
 
 const Page = async ({ params }: PageProps) => {
-  // retrieve file id
-  const { auctionid } = params;
+  // retrieve auction id
+  const { auctionId } = params;
 
   // make sure you have a user
   const { getUser } = getKindeServerSession();
   const user = await getUser();
   if (!user || !user.id)
-    redirect(`auth-callback?origin=dashboard/${auctionid}`);
+    redirect(`auth-callback?origin=dashboard/auctions/${auctionId}`);
 
   // retrieve data from db
   const auction = await db.auction.findFirst({
-    where: { id: auctionid, userId: user.id },
+    where: { id: auctionId, userId: user.id },
   });
 
   if (!auction) return notFound();
@@ -33,7 +34,13 @@ const Page = async ({ params }: PageProps) => {
         {/* left side */}
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
-            <AuctionRenderer />
+            <AuctionRenderer auctionId={auctionId} />
+            <Image
+              src={auction.imgUrl}
+              alt="auction image"
+              width={100}
+              height={100}
+            />
           </div>
         </div>
         {/* end of left side */}

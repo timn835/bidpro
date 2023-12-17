@@ -40,20 +40,23 @@ export const appRouter = router({
     });
   }),
 
+  // getSignedURL: privateAdminProcedure.mutation(async () => {
+  //   return { success: { url: "" } };
+  // }),
+
   // the following procedure implements polling
   getImage: privateAdminProcedure
-    .input(z.object({ key: z.string() }))
+    .input(z.object({ auctionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const { userId } = ctx;
       const auction = await db.auction.findFirst({
         where: {
-          imgKey: input.key,
+          id: input.auctionId,
           userId,
         },
       });
 
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
-
       return auction;
     }),
 

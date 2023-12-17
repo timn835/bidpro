@@ -34,7 +34,6 @@ model Auction {
   imgUploadStatus UploadStatus @default(PENDING)
 
   imgUrl      String
-  imgKey      String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

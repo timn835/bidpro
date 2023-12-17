@@ -8,6 +8,8 @@ import { Gavel, Loader2, Plus, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { useState } from "react";
+import CreateNewAuctionButton from "./CreateNewAuctionButton";
+import Image from "next/image";
 
 const AdminDashboard = () => {
   const [currentlyDeletingAuction, setCurrentlyDeletingAuction] = useState<
@@ -32,7 +34,7 @@ const AdminDashboard = () => {
     <main className="mx-auto max-w-7xl md:p-10">
       <div className="mt-8 flex flex-col items-start justify-between gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-center sm:gap-0">
         <h1 className="mb-3 font-bold text-5xl text-gray-900">My Auctions</h1>
-        <UploadButton />
+        <CreateNewAuctionButton />
       </div>
       {/* Display all user auctions */}
       {auctions && auctions.length !== 0 ? (
@@ -50,10 +52,17 @@ const AdminDashboard = () => {
               >
                 <Link
                   className="flex flex-col gap-2"
-                  href={`/dashboard/${auction.id}`}
+                  href={`/dashboard/auctions/${auction.id}`}
                 >
                   <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
                     <div className="h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" />
+                    <Image
+                      src={
+                        auction.imgUrl
+                          ? auction.imgUrl
+                          : "/standard-auction.jpg"
+                      }
+                    />
                     <div className="flex-1 truncate">
                       <div className="flex items-center space-x-3">
                         <h3 className="truncate text-lg font-medium text-zinc-900">

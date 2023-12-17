@@ -10,16 +10,30 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { useToast } from "./ui/use-toast";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
+import { getSignedURL } from "@/app/dashboard/auctions/actions";
 
-const UploadDropzone = () => {
+const computeSHA256 = async (file: File) => {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  return hashHex;
+};
+
+interface UploadButtonProps {
+  auctionId: string;
+}
+
+const UploadDropzone = ({ auctionId }: UploadButtonProps) => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const { toast } = useToast();
-  const { startUpload } = useUploadThing("imageUploader");
   const { mutate: startPolling } = trpc.getImage.useMutation({
     onSuccess: (auction) => {
-      router.push(`/dashboard/${auction.id}`);
+      router.push("/dashboard");
     },
     retry: true,
     retryDelay: 500,
@@ -43,37 +57,52 @@ const UploadDropzone = () => {
   return (
     <Dropzone
       multiple={false}
-      onDrop={async (acceptedFile) => {
-        // console.log(acceptedFiles);
+      onDrop={async (acceptedFiles) => {
+        const acceptedFile = acceptedFiles[0];
         setIsUploading(true);
         const progressInterval = startSimulatedProgress();
-
-        // handle file uploading
-        const res = await startUpload(acceptedFile);
-
-        if (!res) {
-          return toast({
+        const checksum = await computeSHA256(acceptedFile);
+        const signedURLResult = await getSignedURL(
+          acceptedFile.type,
+          acceptedFile.size,
+          checksum,
+          auctionId
+        );
+        if (signedURLResult.failure !== undefined) {
+          toast({
             title: "Something went wrong",
             description: "Please try again later",
             variant: "destructive",
           });
+          setIsUploading(false);
+          return;
         }
+        const url = signedURLResult.success.url;
 
-        const [fileResponse] = res;
-        const key = fileResponse.key;
-
-        if (!key) {
-          return toast({
+        try {
+          await fetch(url, {
+            method: "PUT",
+            body: acceptedFile,
+            headers: {
+              "Content-Type": acceptedFile?.type,
+            },
+          });
+        } catch (error) {
+          toast({
             title: "Something went wrong",
             description: "Please try again later",
             variant: "destructive",
           });
+          setIsUploading(false);
+          return;
         }
+
+        // await new Promise((resolve) => setTimeout(resolve, 3000));
 
         clearInterval(progressInterval);
         setUploadProgress(100);
 
-        startPolling({ key });
+        startPolling({ auctionId });
       }}
     >
       {({ getRootProps, getInputProps, acceptedFiles }) => (
@@ -135,7 +164,7 @@ const UploadDropzone = () => {
   );
 };
 
-const UploadButton = () => {
+const UploadButton = ({ auctionId }: UploadButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog
@@ -145,10 +174,10 @@ const UploadButton = () => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button>New Auction</Button>
+        <Button>New Image</Button>
       </DialogTrigger>
       <DialogContent>
-        <UploadDropzone />
+        <UploadDropzone auctionId={auctionId} />
       </DialogContent>
     </Dialog>
   );

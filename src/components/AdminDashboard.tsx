@@ -1,7 +1,6 @@
 "use client";
 
 import { trpc } from "@/app/_trpc/client";
-import UploadButton from "./UploadButton";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { Gavel, Loader2, Plus, Trash } from "lucide-react";
@@ -64,8 +63,9 @@ const AdminDashboard = () => {
                             : "/standard-auction.jpg"
                         }
                         alt="auction-image"
-                        layout="fill"
-                        objectFit="cover"
+                        fill
+                        style={{ objectFit: "cover" }}
+                        sizes={"100px"}
                         // objectPosition="top"
                         // width={100}
                         // height={100}
@@ -96,7 +96,9 @@ const AdminDashboard = () => {
                     size="sm"
                     className="w-full"
                     variant="destructive"
-                    onClick={() => deleteAuction({ id: auction.id })}
+                    onClick={() => {
+                      deleteAuction({ id: auction.id });
+                    }}
                   >
                     {currentlyDeletingAuction === auction.id ? (
                       <Loader2 className="h-4 w-4 animate-spin" />

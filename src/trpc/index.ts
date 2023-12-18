@@ -3,6 +3,7 @@ import { privateAdminProcedure, publicProcedure, router } from "./trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -71,7 +72,29 @@ export const appRouter = router({
 
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
 
+      // check if there are lots with this auctionId that exist
+
       await db.auction.delete({ where: { id: input.id } });
+
+      // delete image from s3
+      try {
+        const s3 = new S3Client({
+          region: process.env.AWS_BUCKET_REGION!,
+          credentials: {
+            accessKeyId: process.env.AWS_ACCESS_KEY!,
+            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+          },
+        });
+        const deleteObjectCommand = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: auction.imgUrl.split("/").pop(),
+        });
+        await s3.send(deleteObjectCommand);
+      } catch (error) {
+        console.log("unable to delete image from s3");
+        console.error();
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
 
       return auction;
     }),

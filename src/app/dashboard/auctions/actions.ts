@@ -1,9 +1,14 @@
 "use server";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import crypto from "crypto";
+import { revalidatePath } from "next/cache";
 
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
@@ -70,12 +75,19 @@ export async function getSignedURL(
 
   if (auction.imgUrl) {
     // write code to delete previous image from S3
+    const deleteObjectCommand = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: auction.imgUrl.split("/").pop(),
+    });
+    await s3.send(deleteObjectCommand);
   }
 
   await db.auction.update({
     where: { id: auctionId },
-    data: { imgUrl: signedUrl.split("?").at(0) },
+    data: { imgUrl: signedUrl.split("?").at(0), imgUploadStatus: "SUCCESS" },
   });
+
+  revalidatePath(`/dashboard/auctions/${auctionId}`);
 
   return { success: { url: signedUrl } };
 }

@@ -20,6 +20,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { trpc } from "@/app/_trpc/client";
+import { useToast } from "./ui/use-toast";
 
 const CreateNewAuctionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +37,7 @@ const CreateNewAuctionButton = () => {
         <Button>Create Auction</Button>
       </DialogTrigger>
       <DialogContent>
-        <CreateAuctionForm />
+        <CreateAuctionForm setIsOpen={setIsOpen} />
       </DialogContent>
     </Dialog>
   );
@@ -43,29 +45,35 @@ const CreateNewAuctionButton = () => {
 
 export default CreateNewAuctionButton;
 
-function CreateAuctionForm() {
+type CreateAuctionFormProps = {
+  setIsOpen: (value: boolean) => void;
+};
+
+function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
+  const [serverError, setServerError] = useState("");
+  const utils = trpc.useUtils();
+  const { mutate: createAuction, isLoading: isAuctionCreating } =
+    trpc.createAuction.useMutation({
+      onSuccess: () => {
+        utils.getUserAuctions.invalidate();
+        form.reset();
+        setIsOpen(false);
+      },
+    });
   const form = useForm<TCreateAuctionSchema>({
     resolver: zodResolver(createAuctionSchema),
   });
 
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   formState: { errors, isSubmitting },
-  //   reset,
-  // } = useForm<TCreateAuctionSchema>({
-  //   resolver: zodResolver(createAuctionSchema),
-  // });
-
   const onSubmit = async (data: TCreateAuctionSchema) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log(`
-    submitted:
-    title: ${data.title}
-    location: ${data.location}
-    start date: ${data.startDate}
-    `);
-    // reset();
+    setServerError("");
+    createAuction(
+      // data
+      {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+      }
+    );
   };
 
   return (
@@ -211,11 +219,14 @@ function CreateAuctionForm() {
               </p>
             )}
           </div>
+          <div className="mb-4">
+            {serverError && <p className="text-red-500">{serverError}</p>}
+          </div>
 
           <div className="flex items-center">
             <Button size="lg" type="submit">
               <div className="w-12 text-[18px]">
-                {form.formState.isSubmitting ? (
+                {isAuctionCreating ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
                   "Create"

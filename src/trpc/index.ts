@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { createAuctionSchema } from "@/lib/types";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -41,11 +42,6 @@ export const appRouter = router({
     });
   }),
 
-  // getSignedURL: privateAdminProcedure.mutation(async () => {
-  //   return { success: { url: "" } };
-  // }),
-
-  // the following procedure implements polling
   getImage: privateAdminProcedure
     .input(z.object({ auctionId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -59,6 +55,21 @@ export const appRouter = router({
 
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
       return auction;
+    }),
+
+  createAuction: privateAdminProcedure
+    .input(createAuctionSchema)
+    .mutation(async ({ ctx, input }) => {
+      const newAuction = await db.auction.create({
+        data: {
+          title: input.title,
+          location: input.location,
+          startsAt: input.startDate,
+          endsAt: input.endDate,
+          userId: ctx.userId,
+        },
+      });
+      return newAuction;
     }),
 
   deleteAuction: privateAdminProcedure
@@ -75,6 +86,8 @@ export const appRouter = router({
       // check if there are lots with this auctionId that exist
 
       await db.auction.delete({ where: { id: input.id } });
+
+      if (!auction.imgUrl) return auction;
 
       // delete image from s3
       try {

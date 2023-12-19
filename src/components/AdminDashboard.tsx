@@ -54,7 +54,6 @@ const AdminDashboard = () => {
                   href={`/dashboard/auctions/${auction.id}`}
                 >
                   <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
-                    {/* <div className="relative h-10 w-10 flex-shrink-0 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500" /> */}
                     <div className="relative h-36 w-36">
                       <Image
                         src={

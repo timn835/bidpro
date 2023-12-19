@@ -10,10 +10,10 @@ export const createAuctionSchema = z
       .string()
       .min(1, "A location is required.")
       .max(100, "A location cannot have more that 100 characters."),
-    startDate: z.date({
+    startDate: z.coerce.date({
       required_error: "A start date is required.",
     }),
-    endDate: z.date({
+    endDate: z.coerce.date({
       required_error: "An end date is required.",
     }),
   })

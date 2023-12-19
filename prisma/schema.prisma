@@ -33,13 +33,15 @@ model Auction {
 
   imgUploadStatus UploadStatus @default(PENDING)
 
-  imgUrl      String
+  imgUrl      String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   userId String?  // Foreign key referencing the User model
   User User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
 
 enum Role {

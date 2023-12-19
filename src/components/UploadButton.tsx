@@ -21,9 +21,9 @@ const computeSHA256 = async (file: File) => {
   return hashHex;
 };
 
-interface UploadButtonProps {
+type UploadButtonProps = {
   auctionId: string;
-}
+};
 
 const UploadDropzone = ({ auctionId }: UploadButtonProps) => {
   const router = useRouter();
@@ -31,7 +31,7 @@ const UploadDropzone = ({ auctionId }: UploadButtonProps) => {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const { toast } = useToast();
   const { mutate: startPolling } = trpc.getImage.useMutation({
-    onSuccess: (auction) => {
+    onSuccess: () => {
       router.push("/dashboard");
     },
     retry: true,

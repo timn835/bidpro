@@ -6,6 +6,11 @@ import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type TCreateAuctionSchema, createAuctionSchema } from "@/lib/types";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { cn } from "@/lib/utils";
+import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import { Calendar } from "./ui/calendar";
+import { format } from "date-fns";
 
 const CreateNewAuctionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +35,7 @@ const CreateNewAuctionButton = () => {
 export default CreateNewAuctionButton;
 
 function CreateAuctionForm() {
+  const [date, setDate] = useState<Date>();
   const {
     register,
     handleSubmit,
@@ -41,15 +47,15 @@ function CreateAuctionForm() {
 
   const onSubmit = async (data: TCreateAuctionSchema) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    alert("submitted");
+    console.log("submitted");
     reset();
   };
 
   return (
-    <div className="w-full max-w-xs">
+    <div className="w-full mx-auto">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        className="bg-white rounded px-8 pt-6 pb-8 mb-4 w-full"
       >
         <div className="mb-4">
           <label
@@ -87,8 +93,41 @@ function CreateAuctionForm() {
             <p className="text-red-500">{errors.location.message}</p>
           )}
         </div>
+        <div className="mb-4">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[280px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <div className="flex items-center">
-          <Button>Create</Button>
+          <Button size="lg">
+            <div className="w-12 text-[18px]">
+              {isSubmitting ? (
+                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+              ) : (
+                "Create"
+              )}
+            </div>
+          </Button>
         </div>
       </form>
     </div>

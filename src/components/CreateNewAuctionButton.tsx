@@ -11,6 +11,15 @@ import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 
 const CreateNewAuctionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,101 +44,187 @@ const CreateNewAuctionButton = () => {
 export default CreateNewAuctionButton;
 
 function CreateAuctionForm() {
-  const [date, setDate] = useState<Date>();
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<TCreateAuctionSchema>({
+  const form = useForm<TCreateAuctionSchema>({
     resolver: zodResolver(createAuctionSchema),
   });
 
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   formState: { errors, isSubmitting },
+  //   reset,
+  // } = useForm<TCreateAuctionSchema>({
+  //   resolver: zodResolver(createAuctionSchema),
+  // });
+
   const onSubmit = async (data: TCreateAuctionSchema) => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    console.log("submitted");
-    reset();
+    console.log(`
+    submitted:
+    title: ${data.title}
+    location: ${data.location}
+    start date: ${data.startDate}
+    `);
+    // reset();
   };
 
   return (
     <div className="w-full mx-auto">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="bg-white rounded px-8 pt-6 pb-8 mb-4 w-full"
-      >
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="title"
-          >
-            Title
-          </label>
-          <input
-            {...register("title")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="title"
-            type="text"
-            placeholder="Title"
-          />
-          {errors.title && (
-            <p className="text-red-500">{errors.title.message}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="title"
-          >
-            Location
-          </label>
-          <input
-            {...register("location")}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="location"
-            type="text"
-            placeholder="Location"
-          />
-          {errors.location && (
-            <p className="text-red-500">{errors.location.message}</p>
-          )}
-        </div>
-        <div className="mb-4">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[280px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="flex items-center">
-          <Button size="lg">
-            <div className="w-12 text-[18px]">
-              {isSubmitting ? (
-                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-              ) : (
-                "Create"
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="bg-white rounded px-8 pt-6 pb-8 mb-4 w-full"
+        >
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="title"
+            >
+              Title
+            </label>
+            <input
+              {...form.register("title")}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="title"
+              type="text"
+              placeholder="Title"
+            />
+            {form.formState.errors.title && (
+              <p className="text-red-500">
+                {form.formState.errors.title.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="title"
+            >
+              Location
+            </label>
+            <input
+              {...form.register("location")}
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="location"
+              type="text"
+              placeholder="Location"
+            />
+            {form.formState.errors.location && (
+              <p className="text-red-500">
+                {form.formState.errors.location.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Auction Start Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date < new Date()}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
               )}
-            </div>
-          </Button>
-        </div>
-      </form>
+            />
+            {form.formState.errors.startDate && (
+              <p className="text-red-500">
+                {form.formState.errors.startDate.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Auction End Date</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={"outline"}
+                          className={cn(
+                            "w-[240px] pl-3 text-left font-normal",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {field.value ? (
+                            format(field.value, "PPP")
+                          ) : (
+                            <span>Pick a date</span>
+                          )}
+                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) =>
+                          date < new Date() ||
+                          (form.getValues("startDate") &&
+                            form.getValues("startDate") > date)
+                        }
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {form.formState.errors.endDate && (
+              <p className="text-red-500">
+                {form.formState.errors.endDate.message}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center">
+            <Button size="lg" type="submit">
+              <div className="w-12 text-[18px]">
+                {form.formState.isSubmitting ? (
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                ) : (
+                  "Create"
+                )}
+              </div>
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

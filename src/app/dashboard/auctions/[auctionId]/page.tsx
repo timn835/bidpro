@@ -1,7 +1,9 @@
-import AuctionRenderer from "@/components/AuctionRenderer";
 import LotsWrapper from "@/components/LotsWrapper";
+import UploadImageButton from "@/components/UploadImageButton";
+import UpdateAuctionButton from "@/components/UpdateAuctionButton";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { format } from "date-fns";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
@@ -21,7 +23,6 @@ const Page = async ({ params }: PageProps) => {
   if (!user || !user.id)
     redirect(`auth-callback?origin=dashboard/auctions/${auctionId}`);
 
-  // retrieve data from db
   const auction = await db.auction.findFirst({
     where: { id: auctionId, userId: user.id },
   });
@@ -34,13 +35,58 @@ const Page = async ({ params }: PageProps) => {
         {/* left side */}
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
-            <AuctionRenderer auctionId={auctionId} />
-            <Image
-              src={auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"}
-              alt="auction image"
-              width={100}
-              height={100}
-            />
+            <div className="flex flex-col md:flex-row">
+              <div className="flex flex-col items-center mb-4">
+                <h1 className="font-bold text-xl p-5">{auction.title}</h1>
+                <div className="relative h-80 w-80">
+                  <Image
+                    src={
+                      auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"
+                    }
+                    alt="auction-image"
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes={"500px"}
+                    // objectPosition="top"
+                    // width={100}
+                    // height={100}
+                    className=""
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col items-center md:items-start md:ml-4 justify-around">
+                <div>
+                  <p className="mb-4 truncate">
+                    <span className="font-bold">Location: </span>
+                    {auction.location}
+                  </p>
+                  <p className="mb-4">
+                    <span className="font-bold">Starts on: </span>
+                    {format(new Date(auction.startsAt), "PPpp")}
+                  </p>
+                  <p className="mb-4">
+                    <span className="font-bold">Ends on: </span>
+                    {format(new Date(auction.endsAt), "PPpp")}
+                  </p>
+                  <p className="mb-4 truncate">
+                    <span className="font-bold">Total # of lots: </span>
+                    {auction.numOfLots}
+                  </p>
+                  <p className="mb-4 truncate">
+                    <span className="font-bold">Total # of bids: </span>
+                    To be implemented...
+                  </p>
+                </div>
+                <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-end px-2 gap-x-4">
+                  <UpdateAuctionButton auctionId={auctionId} />
+                  <UploadImageButton auctionId={auctionId} />
+                </div>
+              </div>
+            </div>
+
+            {/* auction renderer */}
+            {/* <div className="w-full bg-white rounded-md shadow flex flex-col items-center"></div> */}
+            {/* end of auction renderer */}
           </div>
         </div>
         {/* end of left side */}

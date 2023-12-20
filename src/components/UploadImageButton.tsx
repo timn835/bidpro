@@ -21,11 +21,11 @@ const computeSHA256 = async (file: File) => {
   return hashHex;
 };
 
-type UploadButtonProps = {
+type UploadImageButtonProps = {
   auctionId: string;
 };
 
-const UploadDropzone = ({ auctionId }: UploadButtonProps) => {
+const UploadDropzone = ({ auctionId }: UploadImageButtonProps) => {
   const router = useRouter();
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
@@ -163,7 +163,7 @@ const UploadDropzone = ({ auctionId }: UploadButtonProps) => {
   );
 };
 
-const UploadButton = ({ auctionId }: UploadButtonProps) => {
+const UploadImageButton = ({ auctionId }: UploadImageButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog
@@ -173,7 +173,7 @@ const UploadButton = ({ auctionId }: UploadButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button>New Image</Button>
+        <Button>Upload Image</Button>
       </DialogTrigger>
       <DialogContent>
         <UploadDropzone auctionId={auctionId} />
@@ -182,4 +182,4 @@ const UploadButton = ({ auctionId }: UploadButtonProps) => {
   );
 };
 
-export default UploadButton;
+export default UploadImageButton;

@@ -1,10 +1,10 @@
-import UploadButton from "./UploadButton";
+import UploadButton from "./UploadImageButton";
 
-interface AuctionProps {
+type AuctionRendererProps = {
   auctionId: string;
-}
+};
 
-const AuctionRenderer = ({ auctionId }: AuctionProps) => {
+const AuctionRenderer = ({ auctionId }: AuctionRendererProps) => {
   return (
     <div className="w-full bg-white rounded-md shadow flex flex-col items-center">
       <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-between px-2">

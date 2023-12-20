@@ -3,7 +3,7 @@
 import { trpc } from "@/app/_trpc/client";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
-import { Gavel, Loader2, Plus, Trash } from "lucide-react";
+import { Layers3, Loader2, Plus, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "./ui/button";
 import { useState } from "react";
@@ -37,7 +37,7 @@ const AdminDashboard = () => {
       </div>
       {/* Display all user auctions */}
       {auctions && auctions.length !== 0 ? (
-        <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2 lg:grid-cols-3">
+        <ul className="mt-8 grid grid-cols-1 gap-6 divide-y divide-zinc-200 md:grid-cols-2">
           {auctions
             .sort(
               (a, b) =>
@@ -73,10 +73,28 @@ const AdminDashboard = () => {
                     </div>
 
                     <div className="flex-1 truncate">
-                      <div className="flex items-center space-x-3">
+                      <div className="flex flex-col space-y-2">
                         <h3 className="truncate text-lg font-medium text-zinc-900">
                           {auction.title}
                         </h3>
+                        <div>
+                          <p className="truncate">
+                            <span className="font-semibold">Location: </span>
+                            {auction.location}
+                          </p>
+                        </div>
+                        <div>
+                          <p>
+                            <span className="font-semibold">Starts on: </span>
+                            {format(new Date(auction.startsAt), "PPPP")}
+                          </p>
+                        </div>
+                        <div>
+                          <p>
+                            <span className="font-semibold">Ends on: </span>
+                            {format(new Date(auction.endsAt), "PPPP")}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -88,8 +106,8 @@ const AdminDashboard = () => {
                     {format(new Date(auction.createdAt), "MMM yyyy")}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Gavel className="h-4 w-4" />
-                    Mocked
+                    <Layers3 className="h-4 w-4" />
+                    {auction.numOfLots} lots
                   </div>
                   <Button
                     size="sm"

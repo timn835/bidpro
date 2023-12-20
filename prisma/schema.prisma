@@ -38,6 +38,8 @@ model Auction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  numOfLots Int @default(0)
+
   userId String?  // Foreign key referencing the User model
   User User? @relation(fields: [userId], references: [id])
 

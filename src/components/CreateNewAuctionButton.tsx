@@ -14,14 +14,12 @@ import { format } from "date-fns";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
-import { useToast } from "./ui/use-toast";
 
 const CreateNewAuctionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -59,6 +57,9 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
         form.reset();
         setIsOpen(false);
       },
+      onError: (err) => {
+        setServerError("Something went wrong, please try again.");
+      },
     });
   const form = useForm<TCreateAuctionSchema>({
     resolver: zodResolver(createAuctionSchema),
@@ -66,18 +67,13 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
 
   const onSubmit = async (data: TCreateAuctionSchema) => {
     setServerError("");
-    createAuction(
-      // data
-      {
-        ...data,
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate),
-      }
-    );
+    const newEndDate = new Date();
+    newEndDate.setDate(newEndDate.getDate() - 1);
+    createAuction(data);
   };
 
   return (
-    <div className="w-full mx-auto">
+    <div className="w-full mx-auto min-h-[80vh]">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}

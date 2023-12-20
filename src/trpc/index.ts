@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { createAuctionSchema } from "@/lib/types";
+import { createAuctionSchema, updateAuctionSchema } from "@/lib/types";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -70,6 +70,45 @@ export const appRouter = router({
         },
       });
       return newAuction;
+    }),
+
+  updateAuction: privateAdminProcedure
+    .input(updateAuctionSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check that the auction to update exists
+      const auctionToUpdate = await db.auction.findFirst({
+        where: { id: input.auctionId },
+      });
+      if (!auctionToUpdate) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // if the auction has already started, check that we are not changing the start date
+      if (auctionToUpdate.startsAt < new Date()) {
+        if (auctionToUpdate.startsAt.getTime() !== input.startDate.getTime()) {
+          throw new TRPCError({ code: "BAD_REQUEST" });
+        }
+      }
+
+      // check that the start date is in the future if it needs to be updated
+      if (
+        input.startDate <= new Date() &&
+        input.startDate.getTime() !== auctionToUpdate.startsAt.getTime()
+      )
+        throw new TRPCError({ code: "BAD_REQUEST" });
+
+      // if the auction has already ended, reject the request
+      if (auctionToUpdate.endsAt < new Date()) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      await db.auction.update({
+        where: { id: input.auctionId },
+        data: {
+          title: input.title,
+          location: input.location,
+          startsAt: input.startDate,
+          endsAt: input.endDate,
+        },
+      });
     }),
 
   deleteAuction: privateAdminProcedure

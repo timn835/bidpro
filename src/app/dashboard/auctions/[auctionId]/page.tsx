@@ -50,7 +50,7 @@ const Page = async ({ params }: PageProps) => {
                     // objectPosition="top"
                     // width={100}
                     // height={100}
-                    className=""
+                    className="rounded-md"
                   />
                 </div>
               </div>
@@ -62,11 +62,11 @@ const Page = async ({ params }: PageProps) => {
                   </p>
                   <p className="mb-4">
                     <span className="font-bold">Starts on: </span>
-                    {format(new Date(auction.startsAt), "PPpp")}
+                    {format(auction.startsAt, "PPpp")}
                   </p>
                   <p className="mb-4">
                     <span className="font-bold">Ends on: </span>
-                    {format(new Date(auction.endsAt), "PPpp")}
+                    {format(auction.endsAt, "PPpp")}
                   </p>
                   <p className="mb-4 truncate">
                     <span className="font-bold">Total # of lots: </span>
@@ -76,10 +76,19 @@ const Page = async ({ params }: PageProps) => {
                     <span className="font-bold">Total # of bids: </span>
                     To be implemented...
                   </p>
+                  <p className="mb-4 truncate">
+                    <span className="font-bold">Most popular lot: </span>
+                    {auction.mostPopularLotTitle
+                      ? auction.mostPopularLotTitle
+                      : "N/A"}
+                  </p>
                 </div>
-                <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-end px-2 gap-x-4">
-                  <UpdateAuctionButton auctionId={auctionId} />
+                <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-center px-2 gap-x-4">
+                  <UpdateAuctionButton auction={auction} />
                   <UploadImageButton auctionId={auctionId} />
+                </div>
+                <div className="h-14 w-full border-b border-zinc-200 flex items-center justify-center px-2 gap-x-4">
+                  <UpdateAuctionButton auction={auction} />
                 </div>
               </div>
             </div>

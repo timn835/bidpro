@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type TCreateAuctionSchema, createAuctionSchema } from "@/lib/types";
+import {
+  type TCreateAuctionSchema,
+  TUpdateAuctionSchema,
+  updateAuctionSchema,
+} from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
@@ -20,8 +24,21 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
+import { useRouter } from "next/navigation";
 
-const UpdateAuctionButton = () => {
+type Auction = {
+  id: string;
+  title: string;
+  location: string;
+  startsAt: Date;
+  endsAt: Date;
+};
+
+type UpdateAuctionButtonProps = {
+  auction: Auction;
+};
+
+const UpdateAuctionButton = ({ auction }: UpdateAuctionButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -35,7 +52,7 @@ const UpdateAuctionButton = () => {
         <Button>Update Auction</Button>
       </DialogTrigger>
       <DialogContent>
-        <CreateAuctionForm setIsOpen={setIsOpen} />
+        <UpdateAuctionForm auction={auction} setIsOpen={setIsOpen} />
       </DialogContent>
     </Dialog>
   );
@@ -43,33 +60,42 @@ const UpdateAuctionButton = () => {
 
 export default UpdateAuctionButton;
 
-type CreateAuctionFormProps = {
+type UpdateAuctionFormProps = {
+  auction: Auction;
   setIsOpen: (value: boolean) => void;
 };
 
-function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
+function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
+  const router = useRouter();
   const [serverError, setServerError] = useState("");
   const utils = trpc.useUtils();
-  const { mutate: createAuction, isLoading: isAuctionCreating } =
-    trpc.createAuction.useMutation({
+  const { mutate: updateAuction, isLoading: isAuctionUpdating } =
+    trpc.updateAuction.useMutation({
       onSuccess: () => {
-        utils.getUserAuctions.invalidate();
-        form.reset();
-        setIsOpen(false);
+        // utils.getUserAuctions.invalidate();
+        // form.reset();
+        // setIsOpen(false);
+        router.push(`/dashboard`);
       },
       onError: (err) => {
         setServerError("Something went wrong, please try again.");
       },
     });
-  const form = useForm<TCreateAuctionSchema>({
-    resolver: zodResolver(createAuctionSchema),
+  const form = useForm<TUpdateAuctionSchema>({
+    resolver: zodResolver(updateAuctionSchema),
   });
 
-  const onSubmit = async (data: TCreateAuctionSchema) => {
+  useEffect(() => {
+    form.setValue("auctionId", auction.id);
+    form.setValue("startDate", auction.startsAt);
+    form.setValue("endDate", auction.endsAt);
+  }, [auction.id, auction.startsAt, auction.endsAt, form]);
+
+  const onSubmit = async (data: TUpdateAuctionSchema) => {
     setServerError("");
-    const newEndDate = new Date();
-    newEndDate.setDate(newEndDate.getDate() - 1);
-    createAuction(data);
+    updateAuction(data);
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    // alert(JSON.stringify(data));
   };
 
   return (
@@ -87,7 +113,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
               Title
             </label>
             <input
-              {...form.register("title")}
+              {...form.register("title", { value: auction.title })}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="title"
               type="text"
@@ -107,7 +133,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
               Location
             </label>
             <input
-              {...form.register("location")}
+              {...form.register("location", { value: auction.location })}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="location"
               type="text"
@@ -221,11 +247,11 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
 
           <div className="flex items-center">
             <Button size="lg" type="submit">
-              <div className="w-12 text-[18px]">
-                {isAuctionCreating ? (
+              <div className="w-14 text-[18px]">
+                {isAuctionUpdating ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
-                  "Create"
+                  "Update"
                 )}
               </div>
             </Button>

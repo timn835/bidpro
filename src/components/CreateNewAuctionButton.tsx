@@ -15,9 +15,9 @@ import {
   Form,
   FormControl,
   FormField,
+  FormDescription,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
 
@@ -58,6 +58,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
         setIsOpen(false);
       },
       onError: (err) => {
+        console.error(err);
         setServerError("Something went wrong, please try again.");
       },
     });
@@ -67,8 +68,6 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
 
   const onSubmit = async (data: TCreateAuctionSchema) => {
     setServerError("");
-    const newEndDate = new Date();
-    newEndDate.setDate(newEndDate.getDate() - 1);
     createAuction(data);
   };
 
@@ -155,7 +154,6 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -205,7 +203,10 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <FormDescription>
+                    *On closing day, the auction closes at 8:00pm local time by
+                    default.
+                  </FormDescription>
                 </FormItem>
               )}
             />

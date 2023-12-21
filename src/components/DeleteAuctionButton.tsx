@@ -79,7 +79,7 @@ function DeleteAuctionConfirm({
             Are you sure you want to delete this auction?
           </h1>
           <Button variant="destructive" size="lg" className="hover:bg-red-100">
-            <div className="w-12">
+            <div className="w-16 text-[18px]">
               {isAuctionDeleting ? (
                 <Loader2 className="h-6 w-6 animate-spin mx-auto" />
               ) : (

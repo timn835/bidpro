@@ -55,7 +55,7 @@ const Page = async ({ params }: PageProps) => {
                   />
                 </div>
               </div>
-              <div className="flex flex-col items-center md:items-start md:ml-4 justify-around">
+              <div className="border-l p-1 flex flex-col items-center md:items-start md:ml-4 justify-around">
                 <div>
                   <p className="mb-4 truncate">
                     <span className="font-bold">Location: </span>
@@ -63,11 +63,11 @@ const Page = async ({ params }: PageProps) => {
                   </p>
                   <p className="mb-4">
                     <span className="font-bold">Starts on: </span>
-                    {format(auction.startsAt, "PPpp")}
+                    {format(auction.startsAt, "Pp")}
                   </p>
                   <p className="mb-4">
                     <span className="font-bold">Ends on: </span>
-                    {format(auction.endsAt, "PPpp")}
+                    {format(auction.endsAt, "Pp")}
                   </p>
                   <p className="mb-4 truncate">
                     <span className="font-bold">Total # of lots: </span>
@@ -85,11 +85,12 @@ const Page = async ({ params }: PageProps) => {
                   </p>
                 </div>
                 <div className="border-b border-t border-zinc-200">
-                  <div className="h-14 w-full flex items-center justify-center px-2 gap-x-4">
+                  <div className="h-14 w-full flex items-center px-2 gap-x-4">
                     <UpdateAuctionButton auction={auction} />
                     <UploadImageButton auctionId={auctionId} />
                   </div>
                   <div className="h-14 w-full flex items-center justify-center px-2 gap-x-4">
+                    <UpdateAuctionButton auction={auction} />
                     <DeleteAuctionButton auctionId={auctionId} />
                   </div>
                 </div>

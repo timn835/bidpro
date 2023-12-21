@@ -15,11 +15,11 @@ import {
   Form,
   FormControl,
   FormField,
-  FormDescription,
   FormItem,
   FormLabel,
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
+import { TimePicker } from "./TimePicker";
 
 const CreateNewAuctionButton = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +72,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
   };
 
   return (
-    <div className="w-full mx-auto min-h-[80vh]">
+    <div className="w-full mx-auto min-h-[80vh] flex flex-col items-top">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -203,10 +203,9 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormDescription>
-                    *On closing day, the auction closes at 8:00pm local time by
-                    default.
-                  </FormDescription>
+                  <div className="p-3 border-t border-border">
+                    <TimePicker setDate={field.onChange} date={field.value} />
+                  </div>
                 </FormItem>
               )}
             />
@@ -219,7 +218,6 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
           <div className="mb-4">
             {serverError && <p className="text-red-500">{serverError}</p>}
           </div>
-
           <div className="flex items-center">
             <Button size="lg" type="submit">
               <div className="w-12 text-[18px]">

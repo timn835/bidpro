@@ -5,11 +5,7 @@ import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type TCreateAuctionSchema,
-  TUpdateAuctionSchema,
-  updateAuctionSchema,
-} from "@/lib/types";
+import { type TUpdateAuctionSchema, updateAuctionSchema } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
@@ -25,6 +21,7 @@ import {
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
+import { TimePicker } from "./TimePicker";
 
 type Auction = {
   id: string;
@@ -231,7 +228,9 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormMessage />
+                  <div className="p-3 border-t border-border">
+                    <TimePicker setDate={field.onChange} date={field.value} />
+                  </div>
                 </FormItem>
               )}
             />

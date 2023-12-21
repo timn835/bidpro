@@ -32,14 +32,14 @@ const Page = async ({ params }: PageProps) => {
 
   return (
     <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
-      <div className="mx-auto w-full max-w-8xl grow lg:flex xl:px-2">
+      <div className="mx-auto w-full grow lg:flex xl:px-2">
         {/* left side */}
         <div className="flex-1 xl:flex">
           <div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
-            <div className="flex flex-col md:flex-row bg-white rounded-md">
+            <div className="flex flex-col md:flex-row justify-around bg-white rounded-md flex-wrap">
               <div className="flex flex-col items-center mb-4">
                 <h1 className="font-bold text-xl p-5">{auction.title}</h1>
-                <div className="relative h-80 w-80">
+                <div className="relative h-80 w-80 md:h-96 md:w-96">
                   <Image
                     src={
                       auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"
@@ -55,7 +55,7 @@ const Page = async ({ params }: PageProps) => {
                   />
                 </div>
               </div>
-              <div className="border-l p-1 flex flex-col items-center md:items-start md:ml-4 justify-around">
+              <div className="p-1 flex flex-col items-center md:items-start md:ml-4 justify-around">
                 <div>
                   <p className="mb-4 truncate">
                     <span className="font-bold">Location: </span>
@@ -90,7 +90,6 @@ const Page = async ({ params }: PageProps) => {
                     <UploadImageButton auctionId={auctionId} />
                   </div>
                   <div className="h-14 w-full flex items-center justify-center px-2 gap-x-4">
-                    <UpdateAuctionButton auction={auction} />
                     <DeleteAuctionButton auctionId={auctionId} />
                   </div>
                 </div>
@@ -101,9 +100,14 @@ const Page = async ({ params }: PageProps) => {
         {/* end of left side */}
 
         {/* right side */}
-        <div className="shrink-0 flex-[0.75] border-t border-gray-200 lg:w-96 lg:border-l lg:border-t-0">
-          <LotsWrapper />
+        <div className="px-4 py-6 sm:px-6 lg:pr-8 xl:pr-6">
+          <div className="flex flex-col md:flex-row bg-white rounded-md">
+            {/* <div className="lg:w-96 max-w-fit"> */}
+            <LotsWrapper />
+            {/* </div> */}
+          </div>
         </div>
+
         {/* end of right side */}
       </div>
     </div>

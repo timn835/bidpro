@@ -21,7 +21,7 @@ import {
 import { trpc } from "@/app/_trpc/client";
 import { TimePicker } from "./TimePicker";
 
-const CreateNewAuctionButton = () => {
+const CreateLotButton = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -37,7 +37,7 @@ const CreateNewAuctionButton = () => {
           variant="secondary"
           className="bg-emerald-200 hover:bg-emerald-300"
         >
-          Create Auction
+          Add a Lot
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -47,7 +47,7 @@ const CreateNewAuctionButton = () => {
   );
 };
 
-export default CreateNewAuctionButton;
+export default CreateLotButton;
 
 type CreateAuctionFormProps = {
   setIsOpen: (value: boolean) => void;

@@ -22,7 +22,7 @@ const DeleteAuctionButton = ({ auctionId }: DeleteAuctionButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button variant="destructive" className="hover:bg-red-100">
+        <Button variant="destructive" size="lg" className="hover:bg-red-100">
           Delete
         </Button>
       </DialogTrigger>

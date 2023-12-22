@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import DeleteAuctionButton from "@/components/DeleteAuctionButton";
+import CreateLotButton from "@/components/CreateLotButton";
 
 interface PageProps {
   params: {
@@ -102,9 +103,13 @@ const Page = async ({ params }: PageProps) => {
         {/* right side */}
         <div className="px-4 py-6 sm:px-6 lg:pr-8 xl:pr-6">
           <div className="flex flex-col md:flex-row bg-white rounded-md">
-            {/* <div className="lg:w-96 max-w-fit"> */}
-            <LotsWrapper />
-            {/* </div> */}
+            <div>
+              <div className="w-full flex flex-wrap justify-between p-4 gap-x-4">
+                <h1 className="font-bold text-xl">Lots registered</h1>
+                <CreateLotButton auctionId={auctionId} />
+              </div>
+              <div>List of lots</div>
+            </div>
           </div>
         </div>
 

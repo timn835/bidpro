@@ -1,11 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type TCreateAuctionSchema, createAuctionSchema } from "@/lib/types";
+import {
+  type TCreateLotSchema,
+  createLotSchema,
+  CATEGORIES,
+} from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
@@ -21,7 +25,11 @@ import {
 import { trpc } from "@/app/_trpc/client";
 import { TimePicker } from "./TimePicker";
 
-const CreateLotButton = () => {
+type CreateLotButtonProps = {
+  auctionId: string;
+};
+
+const CreateLotButton = ({ auctionId }: CreateLotButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -41,7 +49,7 @@ const CreateLotButton = () => {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <CreateAuctionForm setIsOpen={setIsOpen} />
+        <CreateLotForm auctionId={auctionId} setIsOpen={setIsOpen} />
       </DialogContent>
     </Dialog>
   );
@@ -49,17 +57,18 @@ const CreateLotButton = () => {
 
 export default CreateLotButton;
 
-type CreateAuctionFormProps = {
+type CreateLotFormProps = {
+  auctionId: string;
   setIsOpen: (value: boolean) => void;
 };
 
-function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
+function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
   const [serverError, setServerError] = useState("");
   const utils = trpc.useUtils();
-  const { mutate: createAuction, isLoading: isAuctionCreating } =
-    trpc.createAuction.useMutation({
+  const { mutate: createLot, isLoading: isLotCreating } =
+    trpc.createLot.useMutation({
       onSuccess: () => {
-        utils.getUserAuctions.invalidate();
+        utils.getAuctionLots.invalidate();
         form.reset();
         setIsOpen(false);
       },
@@ -68,17 +77,23 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
         setServerError("Something went wrong, please try again.");
       },
     });
-  const form = useForm<TCreateAuctionSchema>({
-    resolver: zodResolver(createAuctionSchema),
+  const form = useForm<TCreateLotSchema>({
+    resolver: zodResolver(createLotSchema),
   });
 
-  const onSubmit = async (data: TCreateAuctionSchema) => {
-    setServerError("");
-    createAuction(data);
+  useEffect(() => {
+    form.setValue("auctionId", auctionId);
+  }, [auctionId, form]);
+
+  const onSubmit = async (data: TCreateLotSchema) => {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log(JSON.stringify(data));
+    // setServerError("");
+    // createLot(data);
   };
 
   return (
-    <div className="w-full mx-auto min-h-[80vh] flex flex-col items-top">
+    <div className="w-full mx-auto min-h-[60vh] flex flex-col items-top">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -107,127 +122,56 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="title"
+              htmlFor="description"
             >
-              Location
+              Description
             </label>
-            <input
-              {...form.register("location")}
+            <textarea
+              {...form.register("description")}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="location"
-              type="text"
-              placeholder="Location"
+              id="description"
+              placeholder="Describe your product"
             />
-            {form.formState.errors.location && (
+            {form.formState.errors.description && (
               <p className="text-red-500">
-                {form.formState.errors.location.message}
+                {form.formState.errors.description.message}
               </p>
             )}
           </div>
           <div className="mb-4">
-            <FormField
-              control={form.control}
-              name="startDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Auction Start Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date()}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )}
-            />
-            {form.formState.errors.startDate && (
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="description"
+            >
+              Category
+            </label>
+
+            <select
+              {...form.register("category")}
+              aria-label="Choose a category"
+              style={{ maxWidth: "500px" }}
+            >
+              {CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+
+            {form.formState.errors.category && (
               <p className="text-red-500">
-                {form.formState.errors.startDate.message}
+                {form.formState.errors.category.message}
               </p>
             )}
           </div>
-          <div className="mb-4">
-            <FormField
-              control={form.control}
-              name="endDate"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Auction End Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-[240px] pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
-                          )}
-                        >
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span>Pick a date</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) =>
-                          date < new Date() ||
-                          (form.getValues("startDate") &&
-                            form.getValues("startDate") > date)
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  <div className="p-3 border-t border-border">
-                    <TimePicker setDate={field.onChange} date={field.value} />
-                  </div>
-                </FormItem>
-              )}
-            />
-            {form.formState.errors.endDate && (
-              <p className="text-red-500">
-                {form.formState.errors.endDate.message}
-              </p>
-            )}
-          </div>
+
           <div className="mb-4">
             {serverError && <p className="text-red-500">{serverError}</p>}
           </div>
           <div className="flex items-center">
             <Button size="lg" type="submit">
               <div className="w-12 text-[18px]">
-                {isAuctionCreating ? (
+                {isLotCreating ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
                   "Create"

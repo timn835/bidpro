@@ -150,6 +150,23 @@ export const appRouter = router({
 
       return auction;
     }),
+
+  getAuctionLots: publicProcedure
+    .input(z.object({ auctionId: z.string() }))
+    .query(async ({ input }) => {
+      return await db.lot.findMany({
+        where: {
+          auctionId: input.auctionId,
+        },
+      });
+    }),
+
+  createLot: privateAdminProcedure
+    .input(z.object({ auctionId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      return "hello";
+    }),
+
   // ...
 });
 

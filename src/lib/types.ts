@@ -53,3 +53,31 @@ export const updateAuctionSchema = z
   });
 
 export type TUpdateAuctionSchema = z.infer<typeof updateAuctionSchema>;
+
+export const CATEGORIES = [
+  "Art and Collectibles",
+  "Antiques and Vintage Items",
+  "Jewelry and Watches",
+  "Electronics and Gadgets",
+  "Automobiles and Vehicles",
+  "Home and Garden",
+  "Fashion and Accessories",
+  "Sports and Fitness Equipment",
+  "Toys and Games",
+  "Fine Wines and Spirits",
+] as const;
+
+export const createLotSchema = z.object({
+  auctionId: z.string().min(1, "An auction id is required."),
+  title: z
+    .string()
+    .min(1, "A title is required.")
+    .max(50, "A title cannot have more than 50 characters."),
+  description: z
+    .string()
+    .min(1, "A description is required.")
+    .max(200, "A description cannot have more that 200 characters."),
+  category: z.enum([...CATEGORIES]),
+});
+
+export type TCreateLotSchema = z.infer<typeof createLotSchema>;

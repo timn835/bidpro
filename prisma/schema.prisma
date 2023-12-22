@@ -42,10 +42,36 @@ model Auction {
   numOfBids Int @default(0)
   mostPopularLotTitle String?
 
+  Lot Lot[]
+
   userId String?  // Foreign key referencing the User model
   User User? @relation(fields: [userId], references: [id])
 
   @@index([userId])
+}
+
+model Lot {
+  id String @id @default(cuid())
+  title String
+  category String
+
+  LotImage LotImage[]
+
+  auctionId String? // Foreign key referencing the Auction model
+  Auction Auction? @relation(fields: [auctionId], references: [id])
+
+  @@index([auctionId])
+}
+
+model LotImage {
+  id String @id @default(cuid())
+  imgUrl String
+
+  lotId String?
+  Lot Lot? @relation(fields: [lotId], references: [id])
+
+  @@index([lotId])
+
 }
 
 enum Role {
@@ -59,3 +85,4 @@ enum UploadStatus {
   FAILED
   SUCCESS
 }
+

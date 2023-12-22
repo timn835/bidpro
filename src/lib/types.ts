@@ -78,6 +78,7 @@ export const createLotSchema = z.object({
     .min(1, "A description is required.")
     .max(200, "A description cannot have more that 200 characters."),
   category: z.enum([...CATEGORIES]),
+  minBid: z.number().min(1, "Your bid is too small."),
 });
 
 export type TCreateLotSchema = z.infer<typeof createLotSchema>;

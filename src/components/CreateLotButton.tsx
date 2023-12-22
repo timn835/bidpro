@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
 import { TimePicker } from "./TimePicker";
+import { Input } from "./ui/input";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -161,6 +162,35 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             {form.formState.errors.category && (
               <p className="text-red-500">
                 {form.formState.errors.category.message}
+              </p>
+            )}
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="minBid"
+            >
+              Minimal Bid
+            </label>
+            <input
+              {...form.register("minBid", { valueAsNumber: true })}
+              className="remove-arrow shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              id="minBid"
+              type="number"
+              step=".01"
+              defaultValue={1.0}
+              // onChange={() => console.log(typeof form.getValues().minBid)}
+              onBlur={() =>
+                form.setValue(
+                  "minBid",
+                  Number(Number(form.getValues().minBid).toFixed(2))
+                )
+              }
+            />
+            {form.formState.errors.minBid && (
+              <p className="text-red-500">
+                {form.formState.errors.minBid.message}
               </p>
             )}
           </div>

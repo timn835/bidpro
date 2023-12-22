@@ -102,7 +102,7 @@ const Page = async ({ params }: PageProps) => {
 
         {/* right side */}
         <div className="px-4 py-6 sm:px-6 lg:pr-8 xl:pr-6">
-          <div className="flex flex-col md:flex-row bg-white rounded-md">
+          <div className="flex flex-col bg-white rounded-md">
             <div>
               <div className="w-full flex flex-wrap justify-between p-4 gap-x-4">
                 <h1 className="font-bold text-xl">Lots registered</h1>

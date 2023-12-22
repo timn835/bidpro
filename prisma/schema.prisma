@@ -17,6 +17,7 @@ model User {
   role Role @default(USER)
 
   Auction Auction[]
+  Bid Bid[]
 
   stripeCustomerId String? @unique @map(name: "stripe_customer_id")
   stripeSubscriptionId String? @unique @map(name: "stripe_subscription_id")
@@ -38,8 +39,8 @@ model Auction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  numOfLots Int @default(0)
-  numOfBids Int @default(0)
+  // numOfLots Int @default(0)
+  // numOfBids Int @default(0)
   mostPopularLotTitle String?
 
   Lot Lot[]
@@ -54,13 +55,16 @@ model Lot {
   id String @id @default(cuid())
   title String
   category String
+  minBid Float @default(1)
+
+  topBidId String? // References the top bid id, but is not a formal relation
 
   LotImage LotImage[]
 
   auctionId String? // Foreign key referencing the Auction model
   Auction Auction? @relation(fields: [auctionId], references: [id])
-
   @@index([auctionId])
+
 }
 
 model LotImage {
@@ -69,9 +73,17 @@ model LotImage {
 
   lotId String?
   Lot Lot? @relation(fields: [lotId], references: [id])
-
   @@index([lotId])
 
+}
+
+model Bid {
+  id String @id @default(cuid())
+  amount Float
+
+  userId String
+  User User? @relation(fields: [userId], references: [id])
+  @@index([userId])
 }
 
 enum Role {

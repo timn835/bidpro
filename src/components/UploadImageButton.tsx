@@ -10,16 +10,7 @@ import { useToast } from "./ui/use-toast";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { getSignedURL } from "@/app/dashboard/auctions/actions";
-
-const computeSHA256 = async (file: File) => {
-  const buffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-  return hashHex;
-};
+import { computeSHA256 } from "@/lib/utils";
 
 type UploadImageButtonProps = {
   auctionId: string;
@@ -60,6 +51,7 @@ const UploadDropzone = ({ auctionId }: UploadImageButtonProps) => {
         const acceptedFile = acceptedFiles[0];
         setIsUploading(true);
         const progressInterval = startSimulatedProgress();
+
         const checksum = await computeSHA256(acceptedFile);
         const signedURLResult = await getSignedURL(
           acceptedFile.type,

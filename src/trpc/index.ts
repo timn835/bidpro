@@ -4,7 +4,11 @@ import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { createAuctionSchema, updateAuctionSchema } from "@/lib/types";
+import {
+  createAuctionSchema,
+  createLotSchema,
+  updateAuctionSchema,
+} from "@/lib/types";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -162,9 +166,26 @@ export const appRouter = router({
     }),
 
   createLot: privateAdminProcedure
-    .input(z.object({ auctionId: z.string() }))
+    .input(createLotSchema)
     .mutation(async ({ ctx, input }) => {
-      return "hello";
+      // make sure the auction exists
+      const auction = await db.auction.findFirst({
+        where: { id: input.auctionId },
+      });
+      if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // make sure the auction has not yet started
+      if (auction.startsAt.getTime() < new Date().getTime())
+        throw new TRPCError({ code: "BAD_REQUEST" });
+
+      // create the lot
+      const newLot = await db.lot.create({
+        data: {
+          ...input,
+        },
+      });
+
+      return newLot;
     }),
 
   // ...

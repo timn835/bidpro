@@ -11,7 +11,7 @@ import {
   CATEGORIES,
 } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, computeSHA256 } from "@/lib/utils";
 import {
   Calendar as CalendarIcon,
   Cloud,
@@ -33,6 +33,8 @@ import { TimePicker } from "./TimePicker";
 import { Input } from "./ui/input";
 import Dropzone, { useDropzone } from "react-dropzone";
 import { Progress } from "./ui/progress";
+import { useToast } from "./ui/use-toast";
+import { getSignedURL } from "@/app/dashboard/auctions/actions";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -72,8 +74,13 @@ type CreateLotFormProps = {
 };
 
 function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [serverError, setServerError] = useState<string>("");
   const [files, setFiles] = useState<Array<File>>([]);
+  const { toast } = useToast();
+  const utils = trpc.useUtils();
+
   const onDrop = useCallback(
     (files: Array<File>) =>
       setFiles((prevFiles) =>
@@ -99,17 +106,16 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
     },
   });
 
-  const utils = trpc.useUtils();
   const { mutate: createLot, isLoading: isLotCreating } =
     trpc.createLot.useMutation({
-      onSuccess: () => {
+      onSuccess: (res) => {
         utils.getAuctionLots.invalidate();
-        form.reset();
-        setIsOpen(false);
       },
       onError: (err) => {
         console.error(err);
-        setServerError("Something went wrong, please try again.");
+        setServerError(
+          "Something went wrong while creating the lot, please try again."
+        );
       },
     });
   const form = useForm<TCreateLotSchema>({
@@ -120,12 +126,77 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
     form.setValue("auctionId", auctionId);
   }, [auctionId, form]);
 
+  const startSimulatedProgress = () => {
+    setUploadProgress(0);
+    const interval = setInterval(() => {
+      setUploadProgress((prevProgress) => {
+        if (prevProgress >= 95) {
+          clearInterval(interval);
+          return prevProgress;
+        }
+        return prevProgress + 5;
+      });
+    }, 500);
+
+    return interval;
+  };
+
   const onSubmit = async (data: TCreateLotSchema) => {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("Files: ", files);
+    setServerError("");
+
+    // First, create the lot
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(JSON.stringify(data));
-    // setServerError("");
-    // createLot(data);
+    createLot(data);
+
+    // Second, upload images
+    if (!files || !files.length) {
+      form.reset();
+      setIsOpen(false);
+    }
+    setIsUploading(true);
+    const progressInterval = startSimulatedProgress();
+
+    const uploadPromises = files.map(async (file) => {
+      const checksum = await computeSHA256(file);
+      const signedURLResult = await getSignedURL(
+        file.type,
+        file.size,
+        checksum,
+        auctionId
+      );
+      if (signedURLResult.failure !== undefined) {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        setIsUploading(false);
+        return;
+      }
+      const url = signedURLResult.success.url;
+      try {
+        await fetch(url, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file?.type,
+          },
+        });
+      } catch (error) {
+        toast({
+          title: "Something went wrong",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        setIsUploading(false);
+        return;
+      }
+    });
+
+    await Promise.allSettled(uploadPromises);
+    clearInterval(progressInterval);
+    setUploadProgress(100);
   };
 
   return (
@@ -236,10 +307,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
               className="border min-h-64 m-4 border-dashed border-gray-300 rounded-lg"
             >
               <div className="flex items-center justify-center min-h-full min-w-full">
-                <div
-                  // htmlFor="dropzone-file"
-                  className="pb-4 flex flex-col items-center justify-center min-w-full min-h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                >
+                <div className="pb-4 flex flex-col items-center justify-center min-w-full min-h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Cloud className="h-6 w-6 text-zinc-500 mb-2 " />
                     <p className="mb-2 text-sm text-zinc-700">

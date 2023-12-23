@@ -16,6 +16,11 @@ import { useState } from "react";
 type AuctionDashboardProps = {
   auction: Auction;
 };
+
+let USDollar = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
 const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
   const [currentlyDeletingLot, setCurrentlyDeletingLot] = useState<
     string | null
@@ -162,6 +167,14 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                                         Description:{" "}
                                       </span>
                                       {lot.description}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <p>
+                                      <span className="font-semibold">
+                                        Minimum bid:{" "}
+                                      </span>
+                                      {USDollar.format(lot.minBid)}
                                     </p>
                                   </div>
                                 </div>

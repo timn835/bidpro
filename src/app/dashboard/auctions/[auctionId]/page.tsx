@@ -1,12 +1,6 @@
-import UploadImageButton from "@/components/UploadImageButton";
-import UpdateAuctionButton from "@/components/UpdateAuctionButton";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { format } from "date-fns";
-import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
-import DeleteAuctionButton from "@/components/DeleteAuctionButton";
-import CreateLotButton from "@/components/CreateLotButton";
 import AuctionDashboard from "@/components/AuctionDashboard";
 
 interface PageProps {

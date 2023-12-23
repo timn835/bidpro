@@ -69,9 +69,9 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
   const { mutate: updateAuction, isLoading: isAuctionUpdating } =
     trpc.updateAuction.useMutation({
       onSuccess: () => {
-        // utils.getUserAuctions.invalidate();
-        // form.reset();
-        // setIsOpen(false);
+        utils.getUserAuctions.invalidate();
+        form.reset();
+        setIsOpen(false);
         router.push(`/dashboard`);
       },
       onError: (err) => {

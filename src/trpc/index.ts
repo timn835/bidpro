@@ -43,6 +43,11 @@ export const appRouter = router({
       where: {
         userId,
       },
+      include: {
+        _count: {
+          select: { Lot: true },
+        },
+      },
     });
   }),
 
@@ -122,11 +127,19 @@ export const appRouter = router({
 
       const auction = await db.auction.findFirst({
         where: { id: input.id, userId },
+        include: {
+          _count: {
+            select: {
+              Lot: true,
+            },
+          },
+        },
       });
 
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
 
       // check if there are lots with this auctionId that exist
+      if (auction._count.Lot > 0) throw new TRPCError({ code: "BAD_REQUEST" });
 
       await db.auction.delete({ where: { id: input.id } });
 
@@ -162,6 +175,11 @@ export const appRouter = router({
         where: {
           auctionId: input.auctionId,
         },
+        include: {
+          _count: {
+            select: { Bid: true },
+          },
+        },
       });
     }),
 
@@ -186,6 +204,80 @@ export const appRouter = router({
       });
 
       return newLot;
+    }),
+
+  deleteLot: privateAdminProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { userId } = ctx;
+
+      const lot = await db.lot.findFirst({
+        where: { id: input.id },
+        select: {
+          Auction: {
+            select: {
+              userId: true,
+            },
+          },
+          LotImage: {
+            select: {
+              id: true,
+              imgUrl: true,
+            },
+          },
+        },
+      });
+
+      if (!lot) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // check if the user that owns the auction of the lot is the same
+      // as the one trying to delete the lot
+      if (lot.Auction?.userId !== userId)
+        throw new TRPCError({ code: "FORBIDDEN" });
+
+      // delete the lot
+      await db.lot.delete({ where: { id: input.id } });
+
+      // delete images from s3
+      const s3 = new S3Client({
+        region: process.env.AWS_BUCKET_REGION!,
+        credentials: {
+          accessKeyId: process.env.AWS_ACCESS_KEY!,
+          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+        },
+      });
+      const deleteImagePromises = lot.LotImage.map(async (image) => {
+        const deleteObjectCommand = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: image.imgUrl.split("/").pop(),
+        });
+        await s3.send(deleteObjectCommand);
+      });
+
+      try {
+        await Promise.all(deleteImagePromises);
+      } catch (error) {
+        console.log("unable to delete image from s3");
+        console.error();
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+
+      // delete images from the database
+      const deleteImageDBPromises = lot.LotImage.map(async (image) => {
+        await db.lotImage.delete({
+          where: {
+            id: image.id,
+          },
+        });
+      });
+      try {
+        await Promise.all(deleteImageDBPromises);
+      } catch (error) {
+        console.log("unable to delete image from db");
+        console.error();
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+      return lot;
     }),
 
   // ...

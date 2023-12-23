@@ -107,12 +107,13 @@ const AdminDashboard = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Layers3 className="h-4 w-4" />
-                    {auction.numOfLots} lots
+                    {auction._count.Lot} lots
                   </div>
                   <Button
                     size="sm"
                     className="w-full"
                     variant="destructive"
+                    disabled={auction._count.Lot > 0}
                     onClick={() => {
                       deleteAuction({ id: auction.id });
                     }}
@@ -132,9 +133,9 @@ const AdminDashboard = () => {
       ) : (
         <div className="mt-16 flex flex-col items-center gap-2">
           <h3 className="font-semibold text-xl">
-            You are not holding any auctions at the moment
+            You are not holding any auctions at the moment.
           </h3>
-          <p>Let&apos;s create your first one</p>
+          <p>Let&apos;s create your first one!</p>
         </div>
       )}
     </main>

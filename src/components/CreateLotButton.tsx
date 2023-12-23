@@ -10,31 +10,13 @@ import {
   createLotSchema,
   CATEGORIES,
 } from "@/lib/types";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { cn, computeSHA256 } from "@/lib/utils";
-import {
-  Calendar as CalendarIcon,
-  Cloud,
-  File,
-  FileX,
-  Loader2,
-} from "lucide-react";
-import { Calendar } from "./ui/calendar";
-import { format } from "date-fns";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-} from "@/components/ui/form";
+import { computeSHA256 } from "@/lib/utils";
+import { Cloud, File, FileX, Loader2 } from "lucide-react";
+import { Form } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
-import { TimePicker } from "./TimePicker";
-import { Input } from "./ui/input";
-import Dropzone, { useDropzone } from "react-dropzone";
-import { Progress } from "./ui/progress";
 import { useToast } from "./ui/use-toast";
 import { getSignedURLForLot } from "@/app/dashboard/auctions/actions";
+import { useDropzone } from "react-dropzone";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -75,7 +57,6 @@ type CreateLotFormProps = {
 
 function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
   const [isUploading, setIsUploading] = useState<boolean>(false);
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [serverError, setServerError] = useState<string>("");
   const [files, setFiles] = useState<Array<File>>([]);
   const { toast } = useToast();
@@ -109,16 +90,12 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
   const { mutate: createLot, isLoading: isLotCreating } =
     trpc.createLot.useMutation({
       onSuccess: async (newLot) => {
-        utils.getAuctionLots.invalidate();
         if (!files || !files.length) {
-          form.reset();
           setIsOpen(false);
           return;
         }
 
         setIsUploading(true);
-        const progressInterval = startSimulatedProgress();
-
         try {
           // Create checksums
           const checksums = await Promise.all(
@@ -129,6 +106,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
           // Get presigned urls from AWS
           const presignedUrlPromises = files.map((file, idx) => {
             return getSignedURLForLot(
+              idx,
               file.type,
               file.size,
               checksums[idx],
@@ -160,10 +138,8 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
           setIsUploading(false);
           return;
         }
-        clearInterval(progressInterval);
-        setUploadProgress(100);
+        utils.getAuctionLots.invalidate();
         setIsUploading(false);
-        form.reset();
         setIsOpen(false);
       },
       onError: (err) => {
@@ -181,25 +157,8 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
     form.setValue("auctionId", auctionId);
   }, [auctionId, form]);
 
-  const startSimulatedProgress = () => {
-    setUploadProgress(0);
-    const interval = setInterval(() => {
-      setUploadProgress((prevProgress) => {
-        if (prevProgress >= 95) {
-          clearInterval(interval);
-          return prevProgress;
-        }
-        return prevProgress + 5;
-      });
-    }, 500);
-
-    return interval;
-  };
-
   const onSubmit = async (data: TCreateLotSchema) => {
     setServerError("");
-
-    console.log(JSON.stringify(data));
     createLot(data);
   };
 
@@ -350,6 +309,22 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
                         </div>
                       ))
                     : null}
+                  {isLotCreating && !isUploading ? (
+                    <div className="w-full mt-4 max-w-xs mx-auto">
+                      <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-centr pt-2">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Creating lot...
+                      </div>
+                    </div>
+                  ) : null}
+                  {isUploading ? (
+                    <div className="w-full mt-4 max-w-xs mx-auto">
+                      <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-centr pt-2">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        Uploading images...
+                      </div>
+                    </div>
+                  ) : null}
                   <input
                     {...getInputProps}
                     type="file"
@@ -367,7 +342,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
           <div className="flex items-center">
             <Button size="lg" type="submit">
               <div className="w-12 text-[18px]">
-                {isLotCreating ? (
+                {isLotCreating || isUploading ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
                   "Create"

@@ -8,10 +8,14 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 type DeleteAuctionButtonProps = {
+  disabled: boolean;
   auctionId: string;
 };
 
-const DeleteAuctionButton = ({ auctionId }: DeleteAuctionButtonProps) => {
+const DeleteAuctionButton = ({
+  auctionId,
+  disabled,
+}: DeleteAuctionButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -22,7 +26,12 @@ const DeleteAuctionButton = ({ auctionId }: DeleteAuctionButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button variant="destructive" size="lg" className="hover:bg-red-100">
+        <Button
+          variant="destructive"
+          size="lg"
+          className="hover:bg-red-100"
+          disabled={disabled}
+        >
           Delete
         </Button>
       </DialogTrigger>

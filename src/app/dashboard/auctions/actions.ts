@@ -98,6 +98,7 @@ export async function getSignedURLForAuction(
 }
 
 export async function getSignedURLForLot(
+  idx: number,
   type: string,
   size: number,
   checksum: string,
@@ -151,9 +152,19 @@ export async function getSignedURLForLot(
     expiresIn: 60,
   });
 
+  const imgUrl = signedUrl.split("?")[0];
+
   await db.lotImage.create({
-    data: { imgUrl: signedUrl.split("?")[0], lotId },
+    data: { imgUrl, lotId },
   });
+
+  // update main image if it is the first one
+  if (idx === 0) {
+    await db.lot.update({
+      where: { id: lotId },
+      data: { mainImgUrl: imgUrl },
+    });
+  }
 
   return { success: { url: signedUrl } };
 }

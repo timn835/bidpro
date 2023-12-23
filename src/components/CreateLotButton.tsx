@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { useForm } from "react-hook-form";
@@ -12,7 +12,13 @@ import {
 } from "@/lib/types";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
+import {
+  Calendar as CalendarIcon,
+  Cloud,
+  File,
+  FileX,
+  Loader2,
+} from "lucide-react";
 import { Calendar } from "./ui/calendar";
 import { format } from "date-fns";
 import {
@@ -25,6 +31,8 @@ import {
 import { trpc } from "@/app/_trpc/client";
 import { TimePicker } from "./TimePicker";
 import { Input } from "./ui/input";
+import Dropzone, { useDropzone } from "react-dropzone";
+import { Progress } from "./ui/progress";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -49,7 +57,7 @@ const CreateLotButton = ({ auctionId }: CreateLotButtonProps) => {
           Add a Lot
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="overflow-y-scroll max-h-screen">
         <CreateLotForm auctionId={auctionId} setIsOpen={setIsOpen} />
       </DialogContent>
     </Dialog>
@@ -64,7 +72,33 @@ type CreateLotFormProps = {
 };
 
 function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState<string>("");
+  const [files, setFiles] = useState<Array<File>>([]);
+  const onDrop = useCallback(
+    (files: Array<File>) =>
+      setFiles((prevFiles) =>
+        prevFiles
+          .concat(
+            files.filter((file) =>
+              prevFiles.every((prevFile) => prevFile.name !== file.name)
+            )
+          )
+          .slice(-5)
+      ),
+    [setFiles]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/png": [".png"],
+      "image/jpeg": [".jpeg", ".jpg"],
+      "image/gif": [".gif"],
+      "image/bmp": [".bmp"],
+      "image/svg+xml": [".svg"],
+    },
+  });
+
   const utils = trpc.useUtils();
   const { mutate: createLot, isLoading: isLotCreating } =
     trpc.createLot.useMutation({
@@ -88,6 +122,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
 
   const onSubmit = async (data: TCreateLotSchema) => {
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("Files: ", files);
     console.log(JSON.stringify(data));
     // setServerError("");
     // createLot(data);
@@ -193,6 +228,65 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
                 {form.formState.errors.minBid.message}
               </p>
             )}
+          </div>
+
+          <div className="mb-4">
+            <div
+              {...getRootProps()}
+              className="border min-h-64 m-4 border-dashed border-gray-300 rounded-lg"
+            >
+              <div className="flex items-center justify-center min-h-full min-w-full">
+                <div
+                  // htmlFor="dropzone-file"
+                  className="pb-4 flex flex-col items-center justify-center min-w-full min-h-full rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Cloud className="h-6 w-6 text-zinc-500 mb-2 " />
+                    <p className="mb-2 text-sm text-zinc-700">
+                      <span className="font-semibold">Click to upload</span> or
+                      drag-and-drop
+                    </p>
+                    <p className="text-xs text-zinc-500">
+                      Images in png/jpeg format
+                    </p>
+                  </div>
+                  {files
+                    ? files.map((file) => (
+                        <div
+                          key={file.name}
+                          className="max-w-xs bg-white flex items-center rounded-md overflow-hidden outline-[1px] outline-zinc-200 divide-x divide-zinc-200"
+                        >
+                          <div className="px-3 py-2 h-full grid place-items-center">
+                            <File className="h-4 w-4 text-blue-500" />
+                          </div>
+                          <div className="px-3 py-2 h-full text-sm truncate w-40 mx-auto">
+                            <div>{file.name}</div>
+                          </div>
+                          <div
+                            className="px-3 py-2 h-full grid place-items-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFiles((prevFiles) =>
+                                prevFiles.filter(
+                                  (prevFile) => prevFile.name !== file.name
+                                )
+                              );
+                            }}
+                          >
+                            <FileX className="h-4 w-4 text-red-500" />
+                          </div>
+                        </div>
+                      ))
+                    : null}
+                  <input
+                    {...getInputProps}
+                    type="file"
+                    id="dropzone-file"
+                    className="hidden"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="mb-4">

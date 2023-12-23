@@ -120,7 +120,9 @@ const UploadDropzone = ({ auctionId }: UploadImageButtonProps) => {
                   <span className="font-semibold">Click to upload</span> or
                   drag-and-drop
                 </p>
-                <p className="text-xs text-zinc-500">Images in png format</p>
+                <p className="text-xs text-zinc-500">
+                  Images in png/jpeg format
+                </p>
               </div>
               {acceptedFiles && acceptedFiles[0] ? (
                 <div className="max-w-xs bg-white flex items-center rounded-md overflow-hidden outline-[1px] outline-zinc-200 divide-x divide-zinc-200">

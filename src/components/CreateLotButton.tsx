@@ -34,7 +34,7 @@ import { Input } from "./ui/input";
 import Dropzone, { useDropzone } from "react-dropzone";
 import { Progress } from "./ui/progress";
 import { useToast } from "./ui/use-toast";
-import { getSignedURL } from "@/app/dashboard/auctions/actions";
+import { getSignedURLForLot } from "@/app/dashboard/auctions/actions";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -108,8 +108,63 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
 
   const { mutate: createLot, isLoading: isLotCreating } =
     trpc.createLot.useMutation({
-      onSuccess: (res) => {
+      onSuccess: async (newLot) => {
         utils.getAuctionLots.invalidate();
+        if (!files || !files.length) {
+          form.reset();
+          setIsOpen(false);
+          return;
+        }
+
+        setIsUploading(true);
+        const progressInterval = startSimulatedProgress();
+
+        try {
+          // Create checksums
+          const checksums = await Promise.all(
+            files.map(async (file) => computeSHA256(file))
+          );
+          if (!checksums) throw new Error("Error with checksums");
+
+          // Get presigned urls from AWS
+          const presignedUrlPromises = files.map((file, idx) => {
+            return getSignedURLForLot(
+              file.type,
+              file.size,
+              checksums[idx],
+              auctionId,
+              newLot.id
+            );
+          });
+          const presignedUrls = await Promise.all(presignedUrlPromises);
+          if (!presignedUrls.every((urlResult) => urlResult.success))
+            throw new Error("Error getting presigned urls");
+
+          // Upload images to S3
+          const uploadImagePromises = files.map(async (file, idx) => {
+            await fetch(presignedUrls[idx].success!.url, {
+              method: "PUT",
+              body: file,
+              headers: {
+                "Content-Type": file.type,
+              },
+            });
+          });
+          await Promise.all(uploadImagePromises);
+        } catch (error) {
+          toast({
+            title: "Something went wrong while uploading images",
+            description: "Please try again later",
+            variant: "destructive",
+          });
+          setIsUploading(false);
+          return;
+        }
+        clearInterval(progressInterval);
+        setUploadProgress(100);
+        setIsUploading(false);
+        form.reset();
+        setIsOpen(false);
       },
       onError: (err) => {
         console.error(err);
@@ -144,59 +199,8 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
   const onSubmit = async (data: TCreateLotSchema) => {
     setServerError("");
 
-    // First, create the lot
-    // await new Promise((resolve) => setTimeout(resolve, 2000));
     console.log(JSON.stringify(data));
     createLot(data);
-
-    // Second, upload images
-    if (!files || !files.length) {
-      form.reset();
-      setIsOpen(false);
-    }
-    setIsUploading(true);
-    const progressInterval = startSimulatedProgress();
-
-    const uploadPromises = files.map(async (file) => {
-      const checksum = await computeSHA256(file);
-      const signedURLResult = await getSignedURL(
-        file.type,
-        file.size,
-        checksum,
-        auctionId
-      );
-      if (signedURLResult.failure !== undefined) {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-        setIsUploading(false);
-        return;
-      }
-      const url = signedURLResult.success.url;
-      try {
-        await fetch(url, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file?.type,
-          },
-        });
-      } catch (error) {
-        toast({
-          title: "Something went wrong",
-          description: "Please try again later",
-          variant: "destructive",
-        });
-        setIsUploading(false);
-        return;
-      }
-    });
-
-    await Promise.allSettled(uploadPromises);
-    clearInterval(progressInterval);
-    setUploadProgress(100);
   };
 
   return (

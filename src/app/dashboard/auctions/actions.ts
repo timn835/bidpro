@@ -21,17 +21,17 @@ const s3 = new S3Client({
   },
 });
 
-const acceptedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 const MAX_FILE_SIZE = 10485760; //10MB
 
-export async function getSignedURL(
+export async function getSignedURLForAuction(
   type: string,
   size: number,
   checksum: string,
   auctionId: string
 ) {
-  if (!acceptedTypes.includes(type)) {
+  if (!ACCEPTED_TYPES.includes(type)) {
     return { failure: "Incorrect file type" };
   }
   if (MAX_FILE_SIZE < size) {
@@ -93,6 +93,67 @@ export async function getSignedURL(
   });
 
   revalidatePath(`/dashboard/auctions/${auctionId}`);
+
+  return { success: { url: signedUrl } };
+}
+
+export async function getSignedURLForLot(
+  type: string,
+  size: number,
+  checksum: string,
+  auctionId: string,
+  lotId: string
+) {
+  if (!ACCEPTED_TYPES.includes(type)) {
+    return { failure: "Incorrect file type" };
+  }
+  if (MAX_FILE_SIZE < size) {
+    return { failure: "File too large" };
+  }
+
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+  if (!user || !user.id) return { failure: "Not authenticated" };
+
+  const dbUser = await db.user.findFirst({
+    where: {
+      id: user.id,
+    },
+  });
+
+  if (!dbUser || !dbUser.role || dbUser.role !== "ADMIN")
+    return { failure: "Not permitted" };
+
+  const auction = await db.auction.findFirst({
+    where: { id: auctionId },
+  });
+
+  if (!auction) {
+    return { failure: "Auction not found" };
+  }
+
+  if (auction.userId !== user.id) {
+    return { failure: "Not permitted" };
+  }
+
+  const putObjectCommand = new PutObjectCommand({
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: generateFileName(),
+    ContentType: type,
+    ContentLength: size,
+    ChecksumSHA256: checksum,
+    Metadata: {
+      userId: user.id,
+    },
+  });
+
+  const signedUrl = await getSignedUrl(s3, putObjectCommand, {
+    expiresIn: 60,
+  });
+
+  await db.lotImage.create({
+    data: { imgUrl: signedUrl.split("?")[0], lotId },
+  });
 
   return { success: { url: signedUrl } };
 }

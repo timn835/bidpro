@@ -9,7 +9,7 @@ import { Progress } from "./ui/progress";
 import { useToast } from "./ui/use-toast";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
-import { getSignedURL } from "@/app/dashboard/auctions/actions";
+import { getSignedURLForAuction } from "@/app/dashboard/auctions/actions";
 import { computeSHA256 } from "@/lib/utils";
 
 type UploadImageButtonProps = {
@@ -53,7 +53,7 @@ const UploadDropzone = ({ auctionId }: UploadImageButtonProps) => {
         const progressInterval = startSimulatedProgress();
 
         const checksum = await computeSHA256(acceptedFile);
-        const signedURLResult = await getSignedURL(
+        const signedURLResult = await getSignedURLForAuction(
           acceptedFile.type,
           acceptedFile.size,
           checksum,

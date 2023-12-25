@@ -63,6 +63,10 @@
   .remove-arrow {
     -moz-appearance: textfield;
   }
+
+  .text-wrap {
+    overflow-wrap: break-word;
+  }
 }
 
 .grainy {

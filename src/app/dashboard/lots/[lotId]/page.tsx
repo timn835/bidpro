@@ -1,3 +1,4 @@
+import LotPage from "@/components/LotPage";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { notFound, redirect } from "next/navigation";
@@ -21,15 +22,8 @@ const Page = async ({ params }: PageProps) => {
   const lot = await db.lot.findFirst({
     where: { id: lotId },
     select: {
-      title: true,
-      description: true,
-      category: true,
-      mainImgUrl: true,
-      minBid: true,
-      topBidId: true,
       Auction: {
         select: {
-          title: true,
           userId: true,
         },
       },
@@ -39,7 +33,11 @@ const Page = async ({ params }: PageProps) => {
   if (!lot) return notFound();
   if (lot.Auction?.userId !== user.id) return notFound();
 
-  return <div>Welcome to the {lot.title} page!!!</div>;
+  return (
+    <div>
+      <LotPage lotId={lotId} lotOwnerId={user.id} />
+    </div>
+  );
 };
 
 export default Page;

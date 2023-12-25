@@ -5,9 +5,9 @@ import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
 import { Layers3, Loader2, Plus, Trash } from "lucide-react";
 import { format } from "date-fns";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useState } from "react";
-import CreateNewAuctionButton from "./CreateNewAuctionButton";
+import CreateNewAuctionButton from "../action_buttons/CreateNewAuctionButton";
 import Image from "next/image";
 
 const AdminDashboard = () => {

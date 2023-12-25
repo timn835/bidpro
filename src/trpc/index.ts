@@ -14,8 +14,8 @@ export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
-    if (!user) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-    if (!user.id || !user.email) throw new TRPCError({ code: "UNAUTHORIZED" });
+    if (!user || !user.id || !user.email)
+      throw new TRPCError({ code: "UNAUTHORIZED" });
 
     // check if the user is in the database
     const dbUser = await db.user.findFirst({
@@ -186,9 +186,16 @@ export const appRouter = router({
   createLot: privateAdminProcedure
     .input(createLotSchema)
     .mutation(async ({ ctx, input }) => {
-      // make sure the auction exists
+      // make sure the auction exists and belongs to user
       const auction = await db.auction.findFirst({
-        where: { id: input.auctionId },
+        where: { id: input.auctionId, userId: ctx.userId },
+        include: {
+          _count: {
+            select: {
+              Lot: true,
+            },
+          },
+        },
       });
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
 
@@ -196,10 +203,14 @@ export const appRouter = router({
       if (auction.startsAt.getTime() < new Date().getTime())
         throw new TRPCError({ code: "BAD_REQUEST" });
 
+      // make sure that there are less than 100 lots
+      if (auction._count.Lot > 99) throw new TRPCError({ code: "BAD_REQUEST" });
+
       // create the lot
       const newLot = await db.lot.create({
         data: {
           ...input,
+          lotNumber: auction._count.Lot + 1,
         },
       });
 
@@ -219,6 +230,7 @@ export const appRouter = router({
               userId: true,
             },
           },
+          lotNumber: true,
           LotImage: {
             select: {
               id: true,
@@ -237,6 +249,20 @@ export const appRouter = router({
 
       // delete the lot
       await db.lot.delete({ where: { id: input.id } });
+
+      // update the lot numbers
+      await db.lot.updateMany({
+        where: {
+          lotNumber: {
+            gt: lot.lotNumber,
+          },
+        },
+        data: {
+          lotNumber: {
+            decrement: 1,
+          },
+        },
+      });
 
       // delete images from s3
       const s3 = new S3Client({

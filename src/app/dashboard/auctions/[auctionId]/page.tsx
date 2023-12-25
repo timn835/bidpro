@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { notFound, redirect } from "next/navigation";
-import AuctionDashboard from "@/components/AuctionDashboard";
+import AuctionDashboard from "@/components/dashboards/AuctionDashboard";
 
 interface PageProps {
   params: {

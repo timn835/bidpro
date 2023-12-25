@@ -1,5 +1,5 @@
-import AdminDashboard from "@/components/AdminDashboard";
-import UserDashboard from "@/components/UserDashboard";
+import AdminDashboard from "@/components/dashboards/AdminDashboard";
+import UserDashboard from "@/components/dashboards/UserDashboard";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";

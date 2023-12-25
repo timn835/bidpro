@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -14,7 +14,7 @@ import { computeSHA256 } from "@/lib/utils";
 import { Cloud, File, FileX, Loader2 } from "lucide-react";
 import { Form } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
-import { useToast } from "./ui/use-toast";
+import { useToast } from "../ui/use-toast";
 import { getSignedURLForLot } from "@/app/dashboard/auctions/actions";
 import { useDropzone } from "react-dropzone";
 

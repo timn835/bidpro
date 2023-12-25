@@ -1,4 +1,4 @@
-import UploadButton from "./UploadImageButton";
+import UploadButton from "./action_buttons/UploadImageButton";
 
 type AuctionRendererProps = {
   auctionId: string;

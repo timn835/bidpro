@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
 import Dropzone from "react-dropzone";
 import { Cloud, File, Loader2 } from "lucide-react";
-import { Progress } from "./ui/progress";
-import { useToast } from "./ui/use-toast";
+import { Progress } from "../ui/progress";
+import { useToast } from "../ui/use-toast";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { getSignedURLForAuction } from "@/app/dashboard/auctions/actions";

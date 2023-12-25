@@ -1,15 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
-import { Button } from "./ui/button";
+import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type TUpdateAuctionSchema, updateAuctionSchema } from "@/lib/types";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { Calendar as CalendarIcon, Loader2 } from "lucide-react";
-import { Calendar } from "./ui/calendar";
+import { Calendar } from "../ui/calendar";
 import { format } from "date-fns";
 import {
   Form,
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
-import { TimePicker } from "./TimePicker";
+import { TimePicker } from "../TimePicker";
 
 type Auction = {
   id: string;

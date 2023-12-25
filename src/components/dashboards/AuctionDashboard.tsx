@@ -1,16 +1,16 @@
 "use client";
 
-import UploadImageButton from "@/components/UploadImageButton";
-import UpdateAuctionButton from "@/components/UpdateAuctionButton";
+import UploadImageButton from "@/components/action_buttons/UploadImageButton";
+import UpdateAuctionButton from "@/components/action_buttons/UpdateAuctionButton";
 import { format } from "date-fns";
 import Image from "next/image";
-import DeleteAuctionButton from "@/components/DeleteAuctionButton";
-import CreateLotButton from "@/components/CreateLotButton";
+import DeleteAuctionButton from "@/components/action_buttons/DeleteAuctionButton";
+import CreateLotButton from "@/components/action_buttons/CreateLotButton";
 import { type Auction } from "@prisma/client";
 import { trpc } from "@/app/_trpc/client";
 import Link from "next/link";
 import { Gavel, Loader2, Plus, Trash } from "lucide-react";
-import { Button } from "./ui/button";
+import { Button } from "../ui/button";
 import { useState } from "react";
 
 type AuctionDashboardProps = {
@@ -159,7 +159,7 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                               <div className="flex-1 overflow-auto">
                                 <div className="flex flex-col space-y-2 items-center">
                                   <h3 className=" text-xl font-medium text-gray-900">
-                                    {lot.title}
+                                    Lot #{lot.lotNumber}: {lot.title}
                                   </h3>
                                   <div>
                                     <p>

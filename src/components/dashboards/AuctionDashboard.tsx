@@ -12,15 +12,12 @@ import Link from "next/link";
 import { Gavel, Loader2, Plus, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { USDollar } from "@/lib/utils";
 
 type AuctionDashboardProps = {
   auction: Auction;
 };
 
-let USDollar = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-});
 const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
   const [currentlyDeletingLot, setCurrentlyDeletingLot] = useState<
     string | null

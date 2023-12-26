@@ -1,6 +1,11 @@
 "use client";
 
+import { trpc } from "@/app/_trpc/client";
 import { Button } from "./ui/button";
+import Skeleton from "react-loading-skeleton";
+import { notFound } from "next/navigation";
+import { USDollar, calcRemainingTime } from "@/lib/utils";
+import ImageSlider from "./ImageSlider";
 
 type LotPageProps = {
   lotId: string;
@@ -8,26 +13,38 @@ type LotPageProps = {
 };
 
 const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
+  const { data: lot, isLoading: isLotLoading } = trpc.getLot.useQuery({
+    lotId,
+  });
+
+  if (isLotLoading)
+    return <Skeleton height={"100vh"} className="my-2" count={1} />;
+
+  if (!lot) return notFound();
   return (
     <div className="flex flex-col justify-center p-4 gap-y-5">
       <div className="w-full p-2 rounded-md bg-white">
         <h1 className="text-wrap text-3xl font-semibold">
-          Lot#3:cccccccccccccccccccccccccccccccllllllllllllllllll;;;;;;;;;;;;;;;;;;;;;;;;
+          Lot #{lot.lotNumber}: {lot.title}
         </h1>
       </div>
       <div className="w-full p-2 rounded-md bg-white h-[50vh]">
-        Image slider
+        <ImageSlider imageUrls={lot.LotImage.map((image) => image.imgUrl)} />
       </div>
       <div className="w-full p-2 rounded-md bg-white flex flex-col items-center">
-        <p>
-          <span className="font-bold">Highest bid:</span> 12$
-        </p>
-        <p>
-          <span className="font-bold">Time remaining:</span> 5d 6h 11m
-        </p>
-        <p>
-          <span className="font-bold">Highest bid:</span> 12$
-        </p>
+        <div className="divide-y-2">
+          <p>
+            <span className="font-bold mr-2">Minimum bid: </span>
+            {USDollar.format(lot.minBid)}
+          </p>
+          <p>
+            <span className="font-bold mr-2">Time remaining:</span>
+            {calcRemainingTime(lot.Auction?.endsAt, lot.lotNumber)}
+          </p>
+          <p>
+            <span className="font-bold mr-2">Highest bid:</span> 12$
+          </p>
+        </div>
       </div>
       <div className="w-full p-2 rounded-md gap-2 bg-white flex flex-wrap justify-around">
         {lotOwnerId ? (

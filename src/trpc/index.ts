@@ -183,6 +183,27 @@ export const appRouter = router({
       });
     }),
 
+  getLot: publicProcedure
+    .input(z.object({ lotId: z.string() }))
+    .query(async ({ input }) => {
+      const lot = await db.lot.findFirst({
+        where: { id: input.lotId },
+        include: {
+          LotImage: {
+            select: {
+              imgUrl: true,
+            },
+          },
+          Auction: {
+            select: {
+              endsAt: true,
+            },
+          },
+        },
+      });
+      return lot;
+    }),
+
   createLot: privateAdminProcedure
     .input(createLotSchema)
     .mutation(async ({ ctx, input }) => {

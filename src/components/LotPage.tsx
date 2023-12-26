@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import Skeleton from "react-loading-skeleton";
 import { notFound } from "next/navigation";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
-import ImageSlider from "./ImageSlider";
+import Carousel from "./Carousel";
 
 type LotPageProps = {
   lotId: string;
@@ -18,7 +18,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
   });
 
   if (isLotLoading)
-    return <Skeleton height={"100vh"} className="my-2" count={1} />;
+    return <Skeleton height={"80vh"} className="my-2" count={1} />;
 
   if (!lot) return notFound();
   return (
@@ -28,9 +28,10 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           Lot #{lot.lotNumber}: {lot.title}
         </h1>
       </div>
-      <div className="w-full p-2 rounded-md bg-white h-[50vh]">
-        <ImageSlider imageUrls={lot.LotImage.map((image) => image.imgUrl)} />
+      <div className="App">
+        <Carousel imgUrls={lot.LotImage.map((image) => image.imgUrl)} />
       </div>
+
       <div className="w-full p-2 rounded-md bg-white flex flex-col items-center">
         <div className="divide-y-2">
           <p>

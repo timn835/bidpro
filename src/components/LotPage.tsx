@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import Skeleton from "react-loading-skeleton";
 import { notFound } from "next/navigation";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
-import Carousel from "./Carousel";
+import ImageSlider from "./ImageSlider";
 
 type LotPageProps = {
   lotId: string;
@@ -28,9 +28,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           Lot #{lot.lotNumber}: {lot.title}
         </h1>
       </div>
-      <div className="App">
-        <Carousel imgUrls={lot.LotImage.map((image) => image.imgUrl)} />
-      </div>
+      <ImageSlider imgUrls={lot.LotImage.map((image) => image.imgUrl)} />
 
       <div className="w-full p-2 rounded-md bg-white flex flex-col items-center">
         <div className="divide-y-2">

@@ -249,7 +249,6 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
               type="number"
               step=".01"
               defaultValue={1.0}
-              // onChange={() => console.log(typeof form.getValues().minBid)}
               onBlur={() =>
                 form.setValue(
                   "minBid",

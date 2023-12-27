@@ -17,6 +17,7 @@ const AdminDashboard = () => {
 
   const utils = trpc.useUtils();
   const { data: auctions, isLoading } = trpc.getUserAuctions.useQuery();
+
   const { mutate: deleteAuction } = trpc.deleteAuction.useMutation({
     onSuccess: () => {
       utils.getUserAuctions.invalidate();

@@ -85,3 +85,23 @@ export const createLotSchema = z.object({
 });
 
 export type TCreateLotSchema = z.infer<typeof createLotSchema>;
+
+export const updateLotSchema = z.object({
+  lotId: z.string().min(1, "A lot id is required."),
+  auctionId: z.string().min(1, "An auction id is required."),
+  title: z
+    .string()
+    .min(1, "A title is required.")
+    .max(50, "A title cannot have more than 50 characters."),
+  description: z
+    .string()
+    .min(1, "A description is required.")
+    .max(200, "A description cannot have more that 200 characters."),
+  category: z.enum([...CATEGORIES]),
+  minBid: z
+    .number({ invalid_type_error: "Your bid must be a number" })
+    .min(1, "Your bid is too small.")
+    .max(1000, "Your minimal bid is too high."),
+});
+
+export type TUpdateLotSchema = z.infer<typeof updateLotSchema>;

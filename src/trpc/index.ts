@@ -8,6 +8,7 @@ import {
   createAuctionSchema,
   createLotSchema,
   updateAuctionSchema,
+  updateLotSchema,
 } from "@/lib/types";
 
 export const appRouter = router({
@@ -189,6 +190,11 @@ export const appRouter = router({
       const lot = await db.lot.findFirst({
         where: { id: input.lotId },
         include: {
+          _count: {
+            select: {
+              Bid: true,
+            },
+          },
           LotImage: {
             select: {
               imgUrl: true,
@@ -196,6 +202,7 @@ export const appRouter = router({
           },
           Auction: {
             select: {
+              id: true,
               endsAt: true,
             },
           },
@@ -236,6 +243,39 @@ export const appRouter = router({
       });
 
       return newLot;
+    }),
+
+  updateLot: privateAdminProcedure
+    .input(updateLotSchema)
+    .mutation(async ({ ctx, input }) => {
+      // check that the auction to update exists
+      const lotToUpdate = await db.lot.findFirst({
+        where: { id: input.lotId },
+        include: {
+          Auction: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+      if (!lotToUpdate) throw new TRPCError({ code: "NOT_FOUND" });
+      if (lotToUpdate.Auction?.userId !== ctx.userId)
+        throw new TRPCError({ code: "FORBIDDEN" });
+
+      const newMinBid = lotToUpdate.topBidId
+        ? lotToUpdate.minBid
+        : input.minBid;
+
+      await db.lot.update({
+        where: { id: input.lotId },
+        data: {
+          title: input.title,
+          description: input.description,
+          category: input.category,
+          minBid: newMinBid,
+        },
+      });
     }),
 
   deleteLot: privateAdminProcedure

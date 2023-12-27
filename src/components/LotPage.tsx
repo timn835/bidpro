@@ -6,6 +6,7 @@ import Skeleton from "react-loading-skeleton";
 import { notFound } from "next/navigation";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
 import ImageSlider from "./ImageSlider";
+import UpdateLotButton from "./action_buttons/UpdateLotButton";
 
 type LotPageProps = {
   lotId: string;
@@ -13,7 +14,11 @@ type LotPageProps = {
 };
 
 const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
-  const { data: lot, isLoading: isLotLoading } = trpc.getLot.useQuery({
+  const {
+    data: lot,
+    isLoading: isLotLoading,
+    refetch,
+  } = trpc.getLot.useQuery({
     lotId,
   });
 
@@ -21,6 +26,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
     return <Skeleton height={"80vh"} className="my-2" count={1} />;
 
   if (!lot) return notFound();
+
   return (
     <div className="flex flex-col md:flex-row justify-center p-4 gap-y-5 md:items-center bg-white m-5">
       <div className="md:min-w-[50vw]">
@@ -35,12 +41,12 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
         <div className="p-2 rounded-md bg-white flex flex-col items-center">
           <div className="divide-y-2">
             <p>
-              <span className="font-bold mr-2">Minimum bid: </span>
-              {USDollar.format(lot.minBid)}
-            </p>
-            <p>
               <span className="font-bold mr-2">Time remaining:</span>
               {calcRemainingTime(lot.Auction?.endsAt, lot.lotNumber)}
+            </p>
+            <p>
+              <span className="font-bold mr-2">Number of bids: </span>
+              {lot._count.Bid}
             </p>
             <p>
               <span className="font-bold mr-2">Minimum bid:</span>{" "}
@@ -51,7 +57,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
         <div className="p-2 rounded-md gap-2 bg-white flex flex-wrap justify-around">
           {lotOwnerId ? (
             <>
-              <Button>Update Lot</Button>
+              <UpdateLotButton lot={lot} refetch={refetch} />
               <Button>Update Images</Button>
               <Button variant="destructive" className="hover:bg-red-100">
                 Delete Lot

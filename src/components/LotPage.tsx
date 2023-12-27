@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
 import ImageSlider from "./ImageSlider";
 import UpdateLotButton from "./action_buttons/UpdateLotButton";
+import RemoveImagesButton from "./action_buttons/RemoveImagesButton";
 
 type LotPageProps = {
   lotId: string;
@@ -58,7 +59,8 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           {lotOwnerId ? (
             <>
               <UpdateLotButton lot={lot} refetch={refetch} />
-              <Button>Update Images</Button>
+              <Button>Add Images</Button>
+              <RemoveImagesButton images={lot.LotImage} refetch={refetch} />
               <Button variant="destructive" className="hover:bg-red-100">
                 Delete Lot
               </Button>

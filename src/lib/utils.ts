@@ -1,6 +1,9 @@
+import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { type ClassValue, clsx } from "clsx";
-import { formatDuration } from "date-fns";
 import { twMerge } from "tailwind-merge";
+import { Image } from "./types";
+import { TRPCError } from "@trpc/server";
+import { db } from "@/db";
 
 // difference between lots ending in seconds
 const LOT_TIME_DELTA = 30;
@@ -43,4 +46,45 @@ export const calcRemainingTime = (
 
   if (durationDays > 31) return "more than a month";
   return `${durationDays} days, ${remainingHours} hours and ${remainingMinutes} minutes`;
+};
+
+export const deleteImagesFromS3 = async (images: Image[]) => {
+  const s3 = new S3Client({
+    region: process.env.AWS_BUCKET_REGION!,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  });
+  const deleteImagePromises = images.map(async (image) => {
+    const deleteObjectCommand = new DeleteObjectCommand({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: image.imgUrl.split("/").pop(),
+    });
+    await s3.send(deleteObjectCommand);
+  });
+
+  try {
+    await Promise.all(deleteImagePromises);
+  } catch (error) {
+    console.log("unable to delete image from s3");
+    console.error();
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+  }
+
+  // delete images from the database
+  const deleteImageDBPromises = images.map(async (image) => {
+    await db.lotImage.delete({
+      where: {
+        id: image.id,
+      },
+    });
+  });
+  try {
+    await Promise.all(deleteImageDBPromises);
+  } catch (error) {
+    console.log("unable to delete image from db");
+    console.error();
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+  }
 };

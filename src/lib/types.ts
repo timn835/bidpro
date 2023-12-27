@@ -105,3 +105,17 @@ export const updateLotSchema = z.object({
 });
 
 export type TUpdateLotSchema = z.infer<typeof updateLotSchema>;
+
+export const imageSchema = z.array(
+  z.object({
+    id: z.string().min(1, "An image id is required."),
+    imgUrl: z.string().min(1, "An image url is required."),
+  })
+);
+
+export type TImageSchema = z.infer<typeof imageSchema>;
+
+export type Image = {
+  id: string;
+  imgUrl: string;
+};

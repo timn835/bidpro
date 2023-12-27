@@ -20,7 +20,7 @@ type Lot = {
   description: string;
   category: string;
   minBid: number;
-  auctionId: string;
+  auctionId: string | null;
 };
 
 type UpdateLotButtonProps = {
@@ -61,7 +61,6 @@ function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
   const { mutate: updateLot, isLoading: isLotUpdating } =
     trpc.updateLot.useMutation({
       onSuccess: () => {
-        // if (lot.auctionId) utils.getAuctionLots.invalidate();
         refetch();
         form.reset();
         setIsOpen(false);
@@ -79,7 +78,7 @@ function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
     form.setValue("lotId", lot.id);
   }, [lot, form]);
 
-  const onSubmit = async (data: TUpdateLotSchema) => {
+  const onSubmit = (data: TUpdateLotSchema) => {
     setServerError("");
     updateLot(data);
   };

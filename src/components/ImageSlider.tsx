@@ -36,7 +36,7 @@ const ImageSlider = ({ imgUrls }: ImageSliderProps) => {
               alt="lot-image"
               fill
               style={{ objectFit: "cover" }}
-              sizes={"800px"}
+              sizes={"1000px"}
               className="rounded-md"
             />
           </div>

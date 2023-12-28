@@ -28,7 +28,7 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
             style={{ backgroundImage: `url(${imgUrls[currentIndex]})` }}
             className="w-full h-full rounded-2xl bg-center bg-cover duration-500"
           /> */}
-          <div className="relative h-full w-full blur-load">
+          <div className="relative h-full w-full">
             <Image
               src={imgUrls[currentIndex]}
               alt="lot-image"
@@ -42,7 +42,7 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
           </div>
         </DialogTrigger>
         <DialogContent className="h-screen min-w-full">
-          <div className="relative h-[90vh] w-[85vw] blur-load">
+          <div className="relative h-[90vh] w-[85vw]">
             <Image
               src={imgUrls[currentIndex]}
               alt="lot-image"

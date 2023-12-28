@@ -10,6 +10,7 @@ import UpdateLotButton from "./action_buttons/UpdateLotButton";
 import RemoveImagesButton from "./action_buttons/RemoveImagesButton";
 import AddImagesButton from "./action_buttons/AddImagesButton";
 import { MAX_NUM_IMGS } from "@/lib/constants";
+import DeleteLotButton from "./action_buttons/DeleteLotButton";
 
 type LotPageProps = {
   lotId: string;
@@ -77,9 +78,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
                 refetch={refetch}
               />
               <RemoveImagesButton images={lot.LotImage} refetch={refetch} />
-              <Button variant="destructive" className="hover:bg-red-100">
-                Delete Lot
-              </Button>
+              <DeleteLotButton lotId={lot.id} auctionId={lot.Auction!.id} />
             </>
           ) : (
             <Button>Bid</Button>

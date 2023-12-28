@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORIES } from "./constants";
 
 export const createAuctionSchema = z
   .object({
@@ -53,19 +54,6 @@ export const updateAuctionSchema = z
   });
 
 export type TUpdateAuctionSchema = z.infer<typeof updateAuctionSchema>;
-
-export const CATEGORIES = [
-  "Art and Collectibles",
-  "Antiques and Vintage Items",
-  "Jewelry and Watches",
-  "Electronics and Gadgets",
-  "Automobiles and Vehicles",
-  "Home and Garden",
-  "Fashion and Accessories",
-  "Sports and Fitness Equipment",
-  "Toys and Games",
-  "Fine Wines and Spirits",
-] as const;
 
 export const createLotSchema = z.object({
   auctionId: z.string().min(1, "An auction id is required."),

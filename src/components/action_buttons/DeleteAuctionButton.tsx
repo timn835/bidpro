@@ -84,7 +84,7 @@ function DeleteAuctionConfirm({
     >
       <div className="flex flex-col items-center">
         <div className="flex flex-col items-center gap-7 mb-4">
-          <h1 className="text-gray-500">
+          <h1 className="text-gray-600">
             Are you sure you want to delete this auction?
           </h1>
           <Button variant="destructive" size="lg" className="hover:bg-red-100">

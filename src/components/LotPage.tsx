@@ -8,6 +8,8 @@ import { USDollar, calcRemainingTime } from "@/lib/utils";
 import ImageSlider from "./ImageSlider";
 import UpdateLotButton from "./action_buttons/UpdateLotButton";
 import RemoveImagesButton from "./action_buttons/RemoveImagesButton";
+import AddImagesButton from "./action_buttons/AddImagesButton";
+import { MAX_NUM_IMGS } from "@/lib/constants";
 
 type LotPageProps = {
   lotId: string;
@@ -59,7 +61,15 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           {lotOwnerId ? (
             <>
               <UpdateLotButton lot={lot} refetch={refetch} />
-              <Button>Add Images</Button>
+              <AddImagesButton
+                lotId={lot.id}
+                auctionId={lot.Auction!.id}
+                numOfImgsRemaining={Math.max(
+                  0,
+                  MAX_NUM_IMGS - lot.LotImage.length
+                )}
+                refetch={refetch}
+              />
               <RemoveImagesButton images={lot.LotImage} refetch={refetch} />
               <Button variant="destructive" className="hover:bg-red-100">
                 Delete Lot

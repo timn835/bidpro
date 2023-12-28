@@ -21,7 +21,7 @@ const RemoveImagesButton = ({ images, refetch }: RemoveImagesButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button variant="destructive" className="hover:bg-red-100">
+        <Button size="lg" variant="destructive" className="hover:bg-red-100">
           Remove Images
         </Button>
       </DialogTrigger>
@@ -108,7 +108,7 @@ const RemoveImagesForm = ({
         ))}
 
         <div className="flex flex-col items-center">
-          <h1 className="text-gray-500 mb-4">
+          <h1 className="text-gray-600 mb-4">
             Are you sure you want to remove the selected images?
           </h1>
           <div className="mb-4">

@@ -5,14 +5,11 @@ import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  type TUpdateLotSchema,
-  updateLotSchema,
-  CATEGORIES,
-} from "@/lib/types";
+import { type TUpdateLotSchema, updateLotSchema } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
+import { CATEGORIES } from "@/lib/constants";
 
 type Lot = {
   id: string;

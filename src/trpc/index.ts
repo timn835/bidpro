@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
 import { S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { getPlaiceholder } from "plaiceholder";
 import {
   createAuctionSchema,
   createLotSchema,
@@ -211,7 +212,15 @@ export const appRouter = router({
           },
         },
       });
-      return lot;
+
+      if (!lot) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // get blur image urls
+      const base64Promises = lot.LotImage.map((image) =>
+        getBase64(image.imgUrl)
+      );
+      const blurImgUrls = await Promise.all(base64Promises);
+      return { lot, blurImgUrls };
     }),
 
   createLot: privateAdminProcedure
@@ -370,3 +379,17 @@ export const appRouter = router({
 // Export type router type signature,
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
+
+const getBase64 = async (url: string) => {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    }
+    const buffer = await res.arrayBuffer();
+    const { base64 } = await getPlaiceholder(Buffer.from(buffer));
+    return base64;
+  } catch (e) {
+    if (e instanceof Error) console.log(e.stack);
+  }
+};

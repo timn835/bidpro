@@ -5,9 +5,10 @@ import Image from "next/image";
 
 type ImageSliderProps = {
   imgUrls: string[];
+  imgBlurUrls?: (string | null)[];
 };
 
-const ImageSlider = ({ imgUrls }: ImageSliderProps) => {
+const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -23,14 +24,25 @@ const ImageSlider = ({ imgUrls }: ImageSliderProps) => {
         }}
       >
         <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-          <div
+          {/* <div
             style={{ backgroundImage: `url(${imgUrls[currentIndex]})` }}
             className="w-full h-full rounded-2xl bg-center bg-cover duration-500"
-            // onClick={() => alert("image clicked")}
-          />
+          /> */}
+          <div className="relative h-full w-full blur-load">
+            <Image
+              src={imgUrls[currentIndex]}
+              alt="lot-image"
+              fill
+              style={{ objectFit: "cover" }}
+              sizes={"600px"}
+              className="rounded-md"
+              placeholder="blur"
+              blurDataURL={imgBlurUrls![currentIndex]!}
+            />
+          </div>
         </DialogTrigger>
         <DialogContent className="h-screen min-w-full">
-          <div className="relative h-[90vh] w-[85vw]">
+          <div className="relative h-[90vh] w-[85vw] blur-load">
             <Image
               src={imgUrls[currentIndex]}
               alt="lot-image"
@@ -38,6 +50,8 @@ const ImageSlider = ({ imgUrls }: ImageSliderProps) => {
               style={{ objectFit: "cover" }}
               sizes={"1000px"}
               className="rounded-md"
+              placeholder="blur"
+              blurDataURL={imgBlurUrls![currentIndex]!}
             />
           </div>
         </DialogContent>

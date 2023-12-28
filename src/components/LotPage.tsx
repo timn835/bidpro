@@ -18,12 +18,15 @@ type LotPageProps = {
 
 const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
   const {
-    data: lot,
+    data,
     isLoading: isLotLoading,
     refetch,
   } = trpc.getLot.useQuery({
     lotId,
   });
+
+  const lot = data?.lot;
+  const blurImgUrls = data?.blurImgUrls;
 
   if (isLotLoading)
     return <Skeleton height={"80vh"} className="my-2" count={1} />;
@@ -38,7 +41,10 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
             Lot #{lot.lotNumber}: {lot.title}
           </h1>
         </div>
-        <ImageSlider imgUrls={lot.LotImage.map((image) => image.imgUrl)} />
+        <ImageSlider
+          imgBlurUrls={blurImgUrls}
+          imgUrls={lot.LotImage.map((image) => image.imgUrl)}
+        />
       </div>
       <div className="md:w-[50vw]">
         <div className="p-2 rounded-md bg-white flex flex-col items-center">

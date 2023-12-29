@@ -243,8 +243,9 @@ export const appRouter = router({
       if (auction.startsAt.getTime() < new Date().getTime())
         throw new TRPCError({ code: "BAD_REQUEST" });
 
-      // make sure that there are less than 100 lots
-      if (auction._count.Lot > 99) throw new TRPCError({ code: "BAD_REQUEST" });
+      // make sure that there are no more than 100 lots
+      if (auction._count.Lot > 100)
+        throw new TRPCError({ code: "BAD_REQUEST" });
 
       // create the lot
       const newLot = await db.lot.create({

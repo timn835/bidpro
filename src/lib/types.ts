@@ -64,7 +64,7 @@ export const createLotSchema = z.object({
   description: z
     .string()
     .min(1, "A description is required.")
-    .max(200, "A description cannot have more that 200 characters."),
+    .max(300, "A description cannot have more that 300 characters."),
   category: z.enum([...CATEGORIES]),
   minBid: z
     .number({ invalid_type_error: "Your bid must be a number" })
@@ -84,7 +84,7 @@ export const updateLotSchema = z.object({
   description: z
     .string()
     .min(1, "A description is required.")
-    .max(200, "A description cannot have more that 200 characters."),
+    .max(300, "A description cannot have more that 300 characters."),
   category: z.enum([...CATEGORIES]),
   minBid: z
     .number({ invalid_type_error: "Your bid must be a number" })

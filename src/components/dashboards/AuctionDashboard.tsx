@@ -113,7 +113,10 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
             <div>
               <div className="w-full flex flex-wrap justify-between p-4 gap-x-4 border-b-2">
                 <h1 className="font-bold text-xl">Lots registered</h1>
-                <CreateLotButton auctionId={auction.id} />
+                <CreateLotButton
+                  auctionId={auction.id}
+                  disabled={auction.startsAt.getTime() < new Date().getTime()}
+                />
               </div>
               <div className="max-h-[70vh] overflow-auto">
                 {/* display auction lots */}

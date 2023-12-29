@@ -54,7 +54,7 @@ model Auction {
 model Lot {
   id String @id @default(cuid())
   title String
-  description String
+  description String @db.VarChar(300)
   category String
   minBid Float @default(1)
   lotNumber Int

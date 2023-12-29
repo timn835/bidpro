@@ -17,9 +17,10 @@ import { CATEGORIES, MAX_NUM_IMGS } from "@/lib/constants";
 
 type CreateLotButtonProps = {
   auctionId: string;
+  disabled: boolean;
 };
 
-const CreateLotButton = ({ auctionId }: CreateLotButtonProps) => {
+const CreateLotButton = ({ auctionId, disabled }: CreateLotButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -34,6 +35,7 @@ const CreateLotButton = ({ auctionId }: CreateLotButtonProps) => {
           size="lg"
           variant="secondary"
           className="bg-emerald-200 hover:bg-emerald-300"
+          disabled={disabled}
         >
           Add a Lot
         </Button>

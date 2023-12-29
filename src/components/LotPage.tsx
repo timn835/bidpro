@@ -44,7 +44,11 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
         </div>
         <ImageSlider
           imgBlurUrls={blurImgUrls}
-          imgUrls={lot.LotImage.map((image) => image.imgUrl)}
+          imgUrls={
+            lot.LotImage.length > 0
+              ? lot.LotImage.map((image) => image.imgUrl)
+              : ["/standard-lot.jpg"]
+          }
         />
       </div>
       <div className="md:w-[50vw]">

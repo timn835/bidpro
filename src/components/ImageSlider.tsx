@@ -11,6 +11,7 @@ type ImageSliderProps = {
 const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  console.log(imgUrls);
 
   const goToSlide = (slideIndex: number) => {
     setCurrentIndex(slideIndex);
@@ -37,7 +38,11 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
               sizes={"600px"}
               className="rounded-md"
               placeholder="blur"
-              blurDataURL={imgBlurUrls![currentIndex]!}
+              blurDataURL={
+                imgBlurUrls!.length > 0
+                  ? imgBlurUrls![currentIndex]!
+                  : "/standard-lot-small.jpg"
+              }
             />
           </div>
         </DialogTrigger>
@@ -51,7 +56,11 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
               sizes={"1000px"}
               className="rounded-md"
               placeholder="blur"
-              blurDataURL={imgBlurUrls![currentIndex]!}
+              blurDataURL={
+                imgBlurUrls!.length > 0
+                  ? imgBlurUrls![currentIndex]!
+                  : "/standard-lot-small.jpg"
+              }
             />
           </div>
         </DialogContent>

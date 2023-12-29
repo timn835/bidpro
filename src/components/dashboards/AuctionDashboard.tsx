@@ -135,7 +135,7 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                         >
                           <Link
                             className="flex flex-col gap-2"
-                            href={`/dashboard/lots/${lot.id}`}
+                            href={`/lots/${lot.id}`}
                           >
                             <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
                               <div className="relative h-36 w-36">

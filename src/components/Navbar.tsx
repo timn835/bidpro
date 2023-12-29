@@ -20,13 +20,13 @@ const Navbar = () => {
           <div className="hidden items-center space-x-4 sm:flex">
             <>
               <Link
-                href=""
+                href="/auctions"
                 className={buttonVariants({
                   variant: "ghost",
                   size: "sm",
                 })}
               >
-                Pricing
+                Auctions
               </Link>
               <LoginLink
                 className={buttonVariants({

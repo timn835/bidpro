@@ -13,6 +13,7 @@ import {
   updateLotSchema,
 } from "@/lib/types";
 import { deleteImagesFromS3 } from "@/lib/utils";
+import { CATEGORIES } from "@/lib/constants";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -184,6 +185,7 @@ export const appRouter = router({
             select: { Bid: true },
           },
         },
+        take: 20,
       });
     }),
 
@@ -254,7 +256,6 @@ export const appRouter = router({
           lotNumber: auction._count.Lot + 1,
         },
       });
-
       return newLot;
     }),
 

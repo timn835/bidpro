@@ -1,7 +1,16 @@
-import React from "react";
+import LotsFeed from "@/components/LotsFeed";
 
-const Page = () => {
-  return <div>Here are the lots for this auction</div>;
+export type PageProps = {
+  params: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
+
+const Page = (props: PageProps) => {
+  return (
+    <main>
+      <LotsFeed {...props} />
+    </main>
+  );
 };
 
 export default Page;

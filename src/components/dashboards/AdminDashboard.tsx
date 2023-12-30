@@ -65,7 +65,7 @@ const AdminDashboard = () => {
                         alt="auction-image"
                         fill
                         style={{ objectFit: "cover" }}
-                        sizes={"100px"}
+                        sizes={"200px"}
                         // objectPosition="top"
                         // width={100}
                         // height={100}

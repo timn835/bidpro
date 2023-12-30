@@ -59,8 +59,8 @@ model Lot {
   minBid Float @default(1)
   lotNumber Int
 
-  mainImgUrl String? // 
-  topBidId String? // References the top bid id, but is not a formal relation
+  mainImgUrl String?
+  topBidId String?
 
   LotImage LotImage[]
   Bid Bid[]

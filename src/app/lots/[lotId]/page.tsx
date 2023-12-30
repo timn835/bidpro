@@ -16,9 +16,6 @@ const Page = async ({ params }: PageProps) => {
   // make sure you have a user
   const { getUser } = getKindeServerSession();
   const user = await getUser();
-  if (!user || !user.id)
-    redirect(`auth-callback?origin=dashboard/lots/${lotId}`);
-
   const lot = await db.lot.findFirst({
     where: { id: lotId },
     select: {
@@ -31,11 +28,12 @@ const Page = async ({ params }: PageProps) => {
   });
 
   if (!lot) return notFound();
-  if (lot.Auction?.userId !== user.id) return notFound();
+  let lotOwnerId;
+  if (user && user.id && lot.Auction?.userId === user.id) lotOwnerId = user.id;
 
   return (
     <div>
-      <LotPage lotId={lotId} lotOwnerId={user.id} />
+      <LotPage lotId={lotId} lotOwnerId={lotOwnerId} />
     </div>
   );
 };

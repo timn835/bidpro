@@ -44,7 +44,7 @@ export const calcRemainingTime = (
   const remainingHours = durationHours - durationDays * 24;
   const remainingMinutes = durationInMinutes - durationHours * 60;
 
-  if (durationDays > 31) return "more than a month";
+  if (durationDays > 365) return "more than a year";
   return `${durationDays} days, ${remainingHours} hours and ${remainingMinutes} minutes`;
 };
 

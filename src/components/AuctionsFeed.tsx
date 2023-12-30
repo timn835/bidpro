@@ -60,7 +60,7 @@ const AuctionsFeed = async () => {
                   alt="auction-image"
                   fill
                   style={{ objectFit: "cover" }}
-                  sizes={"100px"}
+                  sizes={"200px"}
                   className="rounded-full"
                 />
               </div>

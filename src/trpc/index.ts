@@ -382,7 +382,7 @@ export const appRouter = router({
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
 
-const getBase64 = async (url: string) => {
+export const getBase64 = async (url: string) => {
   try {
     const res = await fetch(url);
     if (!res.ok) {

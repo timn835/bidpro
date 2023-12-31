@@ -3,8 +3,12 @@ import { db } from "@/db";
 import LotCard from "./LotCard";
 import { notFound } from "next/navigation";
 import { getBase64 } from "@/trpc";
+import Pagination from "./Pagination";
+import { revalidatePath } from "next/cache";
 
 export type fetchLotsFeedReturnType = typeof fetchLotsFeed;
+
+const PAGE_SIZE = 10;
 
 const fetchLotsFeed = async ({
   auctionId,
@@ -17,7 +21,7 @@ const fetchLotsFeed = async ({
 }) => {
   const lots = await db.lot.findMany({
     where: {
-      auctionId,
+      auctionId: auctionId,
     },
     include: {
       _count: {
@@ -44,7 +48,13 @@ const fetchLotsFeed = async ({
   );
   const blurImgUrls = await Promise.all(base64Promises);
 
-  const total = await db.lot.count();
+  const total = await db.lot.count({
+    where: {
+      auctionId,
+    },
+  });
+
+  revalidatePath(`/auctions/${auctionId}`);
 
   return {
     data: { lots, blurImgUrls },
@@ -56,18 +66,25 @@ const fetchLotsFeed = async ({
 };
 
 const LotsFeed = async ({ params, searchParams }: PageProps) => {
+  const pageNumber = Number(searchParams?.page || 1); // Get the page number. Default to 1 if not provided.
+  const take = PAGE_SIZE;
+  const skip = (pageNumber - 1) * take;
   const auctionId = params.auctionId;
+
   if (typeof auctionId !== "string") {
     return notFound();
   }
-  const { data } = await fetchLotsFeed({ auctionId });
+
+  const { data, metadata } = await fetchLotsFeed({ auctionId, take, skip });
+
   return (
     <div className="space-y-6 p-6">
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 place-items-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {data.lots.map((lot, idx) => (
           <LotCard key={lot.id} lot={lot} blurImgUrl={data.blurImgUrls[idx]!} />
         ))}
       </div>
+      <Pagination {...searchParams} {...metadata} />
     </div>
   );
 };

@@ -31,7 +31,7 @@ type LotCardProps = {
 const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
   const formattedMinBid = USDollar.format(lot.minBid);
   return (
-    <Card className="overflow-hidden rounded-xl bg-white shadow-lg">
+    <Card className="overflow-hidden rounded-xl bg-white shadow-lg flex flex-col justify-between max-w-[250px] h-[500px]">
       <CardContent className="p-6 flex flex-col items-center">
         <CardTitle className="text-2xl font-semibold">
           {`Lot #${lot.lotNumber}: ${lot.title}`}
@@ -55,19 +55,23 @@ const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
           {lot.description}
         </CardDescription> */}
         <p className="text-zinc-600">
-          <span className="font-semibold">Minimum bid: </span>
-          {formattedMinBid}
+          Minimum bid:
+          <span className="pl-2 font-semibold text-zinc-900">
+            {formattedMinBid}
+          </span>
         </p>
         <p className="text-zinc-600">
-          <span className="font-semibold">Number of bids: </span>
-          {lot._count.Bid}
+          Number of bids:
+          <span className="pl-2 font-semibold text-zinc-900">
+            {lot._count.Bid}
+          </span>
         </p>
-        <p className="text-zinc-600 font-semibold">Time remaining:</p>
-        <p className="text-zinc-600">
+        <p className="text-zinc-600">Time remaining:</p>
+        <p className="font-semibold text-zinc-900">
           {calcRemainingTime(lot.Auction?.endsAt.toISOString(), lot.lotNumber)}
         </p>
       </CardContent>
-      <CardFooter className="bg-gray-50 p-6 dark:bg-zinc-900">
+      <CardFooter className="bg-gray-50 dark:bg-zinc-900">
         <Button size="lg" className="w-full">
           Bid {formattedMinBid}
         </Button>

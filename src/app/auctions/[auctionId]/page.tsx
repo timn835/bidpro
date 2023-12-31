@@ -16,6 +16,13 @@ const fetchAuctionInfo = async (auctionId: string) => {
     where: {
       id: auctionId,
     },
+    include: {
+      _count: {
+        select: {
+          Lot: true,
+        },
+      },
+    },
   });
 
   // fetch blur image

@@ -9,6 +9,7 @@ type AuctionHeaderProps = {
     startsAt: Date;
     endsAt: Date;
     imgUrl: string | null;
+    _count: { Lot: number };
   };
   blurImgUrl: string;
 };
@@ -28,19 +29,30 @@ const AuctionHeader = ({ auction, blurImgUrl }: AuctionHeaderProps) => {
         />
       </div>
       <div className="flex flex-col justify-center items-center gap-y-5 p-4">
-        <h1 className="text-5xl font-semibold">{auction.title}</h1>
+        <h1 className="text-5xl font-semibold text-zinc-900">
+          {auction.title}
+        </h1>
         <p className="text-xl">
           Runs between{" "}
-          <span className="font-semibold">
+          <span className="font-semibold text-zinc-900">
             {format(auction.startsAt, "PPPP")}
           </span>{" "}
           and{" "}
-          <span className="font-semibold">
+          <span className="font-semibold text-zinc-900">
             {format(auction.endsAt, "PPPP")}
           </span>
         </p>
         <p className="text-xl">
-          Held at <span className="font-semibold">{auction.location}</span>
+          Held at{" "}
+          <span className="font-semibold text-zinc-900">
+            {auction.location}
+          </span>
+        </p>
+        <p className="text-xl">
+          A total of{" "}
+          <span className="font-semibold text-zinc-900">
+            {auction._count.Lot} lots to choose from
+          </span>
         </p>
       </div>
     </div>

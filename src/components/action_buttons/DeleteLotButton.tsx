@@ -23,7 +23,12 @@ const DeleteLotButton = ({ lotId, auctionId }: DeleteLotButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button size="lg" variant="destructive" className="hover:bg-red-100">
+        <Button
+          size="lg"
+          variant="destructive"
+          className="hover:bg-red-100"
+          aria-label="open dialog box to delete the lot"
+        >
           Delete Lot
         </Button>
       </DialogTrigger>
@@ -83,7 +88,12 @@ function DeleteLotConfirm({
           <h1 className="text-gray-600">
             Are you sure you want to delete this lot?
           </h1>
-          <Button variant="destructive" size="lg" className="hover:bg-red-100">
+          <Button
+            variant="destructive"
+            size="lg"
+            className="hover:bg-red-100"
+            aria-label="proceed to deleting the lot"
+          >
             <div className="w-16 text-[18px]">
               {isLotDeleting ? (
                 <Loader2 className="h-6 w-6 animate-spin mx-auto" />

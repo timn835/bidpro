@@ -167,7 +167,9 @@ const UploadImageButton = ({ auctionId }: UploadImageButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button>Upload Image</Button>
+        <Button aria-label="open dialog box to upload an image for the auction">
+          Upload Image
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <UploadDropzone auctionId={auctionId} />

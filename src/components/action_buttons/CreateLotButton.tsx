@@ -36,6 +36,7 @@ const CreateLotButton = ({ auctionId, disabled }: CreateLotButtonProps) => {
           variant="secondary"
           className="bg-emerald-200 hover:bg-emerald-300"
           disabled={disabled}
+          aria-label="open dialog box to create a new lot"
         >
           Add a Lot
         </Button>
@@ -338,7 +339,11 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             {serverError && <p className="text-red-500">{serverError}</p>}
           </div>
           <div className="flex items-center">
-            <Button size="lg" type="submit">
+            <Button
+              size="lg"
+              type="submit"
+              aria-label="proceed to create the lot"
+            >
               <div className="w-12 text-[18px]">
                 {isLotCreating || isUploading ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />

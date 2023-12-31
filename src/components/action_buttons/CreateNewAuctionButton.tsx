@@ -36,6 +36,7 @@ const CreateNewAuctionButton = () => {
           size="lg"
           variant="secondary"
           className="bg-emerald-200 hover:bg-emerald-300"
+          aria-label="open dialog box to create a new auction"
         >
           Create Auction
         </Button>
@@ -140,6 +141,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                             "w-[240px] pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
+                          aria-label="open calendar to select auction start date"
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -185,6 +187,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                             "w-[240px] pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
+                          aria-label="open calendar to select auction end date"
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -225,7 +228,11 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
             {serverError && <p className="text-red-500">{serverError}</p>}
           </div>
           <div className="flex items-center">
-            <Button size="lg" type="submit">
+            <Button
+              size="lg"
+              type="submit"
+              aria-label="proceed to create a new auction"
+            >
               <div className="w-12 text-[18px]">
                 {isAuctionCreating ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />

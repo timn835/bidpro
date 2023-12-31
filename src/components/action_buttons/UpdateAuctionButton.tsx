@@ -46,7 +46,9 @@ const UpdateAuctionButton = ({ auction }: UpdateAuctionButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button>Update Auction</Button>
+        <Button aria-label="open dialog box to update the auction">
+          Update Auction
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <UpdateAuctionForm auction={auction} setIsOpen={setIsOpen} />
@@ -158,6 +160,7 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
                             "w-[240px] pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
+                          aria-label="open calendar to select a new start date"
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -204,6 +207,7 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
                             "w-[240px] pl-3 text-left font-normal",
                             !field.value && "text-muted-foreground"
                           )}
+                          aria-label="open calendar to select a new end date"
                         >
                           {field.value ? (
                             format(field.value, "PPP")
@@ -245,7 +249,11 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
           </div>
 
           <div className="flex items-center">
-            <Button size="lg" type="submit">
+            <Button
+              size="lg"
+              type="submit"
+              aria-label="proceed to updating the auction"
+            >
               <div className="w-14 text-[18px]">
                 {isAuctionUpdating ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />

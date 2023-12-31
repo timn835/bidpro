@@ -21,7 +21,12 @@ const RemoveImagesButton = ({ images, refetch }: RemoveImagesButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button size="lg" variant="destructive" className="hover:bg-red-100">
+        <Button
+          size="lg"
+          variant="destructive"
+          className="hover:bg-red-100"
+          aria-label="open dialog box to remove images"
+        >
           Remove Images
         </Button>
       </DialogTrigger>
@@ -114,7 +119,12 @@ const RemoveImagesForm = ({
           <div className="mb-4">
             {serverError && <p className="text-red-500">{serverError}</p>}
           </div>
-          <Button variant="destructive" size="lg" className="hover:bg-red-100">
+          <Button
+            variant="destructive"
+            size="lg"
+            className="hover:bg-red-100"
+            aria-label="proceed to deleting the selected images"
+          >
             <div className="w-14 text-[18px]">
               {areImagesDeleting ? (
                 <Loader2 className="h-6 w-6 animate-spin mx-auto" />

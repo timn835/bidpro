@@ -36,7 +36,9 @@ const UpdateLotButton = ({ lot, refetch }: UpdateLotButtonProps) => {
       }}
     >
       <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-        <Button>Update Lot</Button>
+        <Button aria-label="open dialog box to update the lot">
+          Update Lot
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <UpdateLotForm lot={lot} refetch={refetch} setIsOpen={setIsOpen} />
@@ -189,7 +191,11 @@ function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
         </div>
 
         <div className="flex items-center">
-          <Button size="lg" type="submit">
+          <Button
+            size="lg"
+            type="submit"
+            aria-label="proceed to updating the lot"
+          >
             <div className="w-14 text-[18px]">
               {isLotUpdating ? (
                 <Loader2 className="h-6 w-6 animate-spin mx-auto" />

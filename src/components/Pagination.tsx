@@ -18,7 +18,7 @@ const Pagination = ({
 
     if (currentPage <= 3) {
       startPage = 1;
-      endPage = 5;
+      endPage = Math.min(5, totalPages);
     } else if (currentPage >= totalPages - 2) {
       startPage = totalPages - 4;
       endPage = totalPages;

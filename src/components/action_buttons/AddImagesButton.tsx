@@ -35,6 +35,7 @@ const AddImagesButton = ({
           variant="secondary"
           className="bg-emerald-200 hover:bg-emerald-300"
           disabled={numOfImgsRemaining <= 0}
+          aria-label="open dialog box to add images to the lot"
         >
           Add Images
         </Button>
@@ -214,7 +215,12 @@ const AddImagesForm = ({
           </div>
         </div>
         <div className="mx-auto text-center">
-          <Button size="lg" type="submit" disabled={files.length === 0}>
+          <Button
+            size="lg"
+            type="submit"
+            disabled={files.length === 0}
+            aria-label="proceed to add images to the lot"
+          >
             <div className="w-12 text-[18px]">
               {isUploading ? (
                 <Loader2 className="h-6 w-6 animate-spin mx-auto" />

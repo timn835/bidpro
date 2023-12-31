@@ -31,10 +31,11 @@ type LotCardProps = {
 const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
   const formattedMinBid = USDollar.format(lot.minBid);
   return (
-    <Card className="overflow-hidden rounded-xl bg-white shadow-lg flex flex-col justify-between max-w-[250px] h-[500px]">
+    <Card className="overflow-hidden rounded-xl bg-white shadow-lg flex flex-col justify-between max-w-[250px] h-[530px]">
       <CardContent className="p-6 flex flex-col items-center">
-        <CardTitle className="text-2xl font-semibold">
-          {`Lot #${lot.lotNumber}: ${lot.title}`}
+        <CardTitle className="text-2xl font-semibold text-center">
+          <p>{`Lot #${lot.lotNumber}`}</p>
+          <p>{`${lot.title}`}</p>
         </CardTitle>
         <Link href={`/lots/${lot.id}`}>
           <div className="m-5 relative h-44 w-44">
@@ -67,7 +68,7 @@ const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
           </span>
         </p>
         <p className="text-zinc-600">Time remaining:</p>
-        <p className="font-semibold text-zinc-900">
+        <p className="font-semibold text-zinc-900 text-center">
           {calcRemainingTime(lot.Auction?.endsAt.toISOString(), lot.lotNumber)}
         </p>
       </CardContent>

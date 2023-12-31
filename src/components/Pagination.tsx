@@ -42,6 +42,17 @@ const Pagination = ({
       >
         Previous
       </Link>
+      {currentPage - 2 > 1 ? (
+        <>
+          <Link
+            className="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 rounded-md "
+            href="?page=1"
+          >
+            1
+          </Link>
+          <div>...</div>
+        </>
+      ) : null}
 
       <nav
         aria-label="Pagination"
@@ -62,6 +73,18 @@ const Pagination = ({
           </Link>
         ))}
       </nav>
+
+      {totalPages - currentPage > 2 ? (
+        <>
+          <div>...</div>
+          <Link
+            className="relative inline-flex items-center border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-50 rounded-md "
+            href={`?page=${totalPages}`}
+          >
+            {totalPages}
+          </Link>
+        </>
+      ) : null}
 
       <Link
         className={cn(

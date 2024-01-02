@@ -14,6 +14,7 @@ import {
 } from "@/lib/types";
 import { deleteImagesFromS3 } from "@/lib/utils";
 import { CATEGORIES } from "@/lib/constants";
+import { revalidatePath } from "next/cache";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -123,6 +124,9 @@ export const appRouter = router({
           endsAt: input.endDate,
         },
       });
+
+      // revalidate path
+      revalidatePath(`/dashboard/auctions/${input.auctionId}`);
     }),
 
   deleteAuction: privateAdminProcedure
@@ -246,8 +250,10 @@ export const appRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST" });
 
       // make sure that there are no more than 100 lots
-      if (auction._count.Lot > 100)
+      if (auction._count.Lot > 99) {
+        console.log(auction._count.Lot);
         throw new TRPCError({ code: "BAD_REQUEST" });
+      }
 
       // create the lot
       const newLot = await db.lot.create({

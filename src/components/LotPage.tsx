@@ -81,7 +81,11 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
                 )}
                 refetch={refetch}
               />
-              <RemoveImagesButton images={lot.LotImage} refetch={refetch} />
+              <RemoveImagesButton
+                images={lot.LotImage}
+                refetch={refetch}
+                disabled={lot.LotImage.length === 0}
+              />
               <DeleteLotButton lotId={lot.id} auctionId={lot.Auction!.id} />
             </>
           ) : (

@@ -22,6 +22,7 @@ import {
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import { TimePicker } from "../TimePicker";
+import { Input } from "../ui/input";
 
 type Auction = {
   id: string;
@@ -111,9 +112,8 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
             >
               Title
             </label>
-            <input
+            <Input
               {...form.register("title", { value: auction.title })}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="title"
               type="text"
               placeholder="Title"
@@ -131,9 +131,8 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
             >
               Location
             </label>
-            <input
+            <Input
               {...form.register("location", { value: auction.location })}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="location"
               type="text"
               placeholder="Location"

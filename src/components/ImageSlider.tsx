@@ -11,7 +11,6 @@ type ImageSliderProps = {
 const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
-  console.log(imgUrls);
 
   const goToSlide = (slideIndex: number) => {
     setCurrentIndex(slideIndex);
@@ -25,10 +24,6 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
         }}
       >
         <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-          {/* <div
-            style={{ backgroundImage: `url(${imgUrls[currentIndex]})` }}
-            className="w-full h-full rounded-2xl bg-center bg-cover duration-500"
-          /> */}
           <div className="relative h-full w-full">
             <Image
               src={imgUrls[currentIndex]}
@@ -53,7 +48,7 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
               alt="lot-image"
               fill
               style={{ objectFit: "cover" }}
-              sizes={"1000px"}
+              sizes={"2000px"}
               className="rounded-md"
               placeholder="blur"
               blurDataURL={

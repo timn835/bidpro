@@ -8,10 +8,15 @@ import Image from "next/image";
 
 type RemoveImagesButtonProps = {
   images: ImageType[];
+  disabled: boolean;
   refetch: () => void;
 };
 
-const RemoveImagesButton = ({ images, refetch }: RemoveImagesButtonProps) => {
+const RemoveImagesButton = ({
+  images,
+  disabled,
+  refetch,
+}: RemoveImagesButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <Dialog
@@ -26,6 +31,7 @@ const RemoveImagesButton = ({ images, refetch }: RemoveImagesButtonProps) => {
           variant="destructive"
           className="hover:bg-red-100"
           aria-label="open dialog box to remove images"
+          disabled={disabled}
         >
           Remove Images
         </Button>

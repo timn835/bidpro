@@ -10,6 +10,17 @@ import { Loader2 } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
 import { CATEGORIES } from "@/lib/constants";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 type Lot = {
   id: string;
@@ -84,128 +95,137 @@ function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
 
   return (
     <div className="w-full mx-auto min-h-[80vh]">
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="bg-white rounded px-8 pt-6 pb-8 mb-4 w-full"
-      >
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="title"
-          >
-            Title
-          </label>
-          <input
-            {...form.register("title", { value: lot.title })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="title"
-            type="text"
-            placeholder="Title"
-          />
-          {form.formState.errors.title && (
-            <p className="text-red-500">
-              {form.formState.errors.title.message}
-            </p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="title"
-          >
-            Description
-          </label>
-          <textarea
-            {...form.register("description", { value: lot.description })}
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="description"
-            placeholder="Describe your product"
-          />
-          {form.formState.errors.description && (
-            <p className="text-red-500">
-              {form.formState.errors.description.message}
-            </p>
-          )}
-        </div>
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="bg-white rounded px-8 pt-6 pb-8 mb-4 w-full"
+        >
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="title"
+            >
+              Title
+            </label>
+            <Input
+              {...form.register("title", { value: lot.title })}
+              id="title"
+              type="text"
+              placeholder="Title"
+            />
 
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="description"
-          >
-            Category
-          </label>
+            {form.formState.errors.title && (
+              <p className="text-red-500">
+                {form.formState.errors.title.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="description"
+            >
+              Description
+            </label>
+            <Textarea
+              {...form.register("description", { value: lot.description })}
+              rows={1}
+              id="description"
+              placeholder="Describe your product"
+              maxRows={4}
+            />
+            {form.formState.errors.description && (
+              <p className="text-red-500">
+                {form.formState.errors.description.message}
+              </p>
+            )}
+          </div>
 
-          <select
-            {...form.register("category", {
-              value:
-                CATEGORIES.find((el) => el === lot.category) || CATEGORIES[0],
-            })}
-            aria-label="Choose a category"
-            style={{ maxWidth: "500px" }}
-          >
-            {CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-
-          {form.formState.errors.category && (
-            <p className="text-red-500">
-              {form.formState.errors.category.message}
-            </p>
-          )}
-        </div>
-        <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="minBid"
-          >
-            Minimal Bid
-          </label>
-          <input
-            {...form.register("minBid", {
-              valueAsNumber: true,
-              value: lot.minBid,
-            })}
-            className="remove-arrow shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="minBid"
-            type="number"
-            step=".01"
-            onBlur={() =>
-              form.setValue(
-                "minBid",
-                Number(Number(form.getValues().minBid).toFixed(2))
-              )
-            }
-          />
-          {form.formState.errors.minBid && (
-            <p className="text-red-500">
-              {form.formState.errors.minBid.message}
-            </p>
-          )}
-        </div>
-        <div className="mb-4">
-          {serverError && <p className="text-red-500">{serverError}</p>}
-        </div>
-
-        <div className="flex items-center">
-          <Button
-            size="lg"
-            type="submit"
-            aria-label="proceed to updating the lot"
-          >
-            <div className="w-14 text-[18px]">
-              {isLotUpdating ? (
-                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-              ) : (
-                "Update"
+          <div className="mb-4">
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={CATEGORIES.find((el) => el === lot.category)}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-[280px]">
+                        <SelectValue placeholder="Choose a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        {CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
               )}
-            </div>
-          </Button>
-        </div>
-      </form>
+            />
+            {form.formState.errors.category && (
+              <p className="text-red-500">
+                {form.formState.errors.category.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="minBid"
+            >
+              Minimal Bid
+            </label>
+            <Input
+              {...form.register("minBid", {
+                valueAsNumber: true,
+                value: lot.minBid,
+              })}
+              className="remove-arrow"
+              id="minBid"
+              type="number"
+              step=".01"
+              onBlur={() =>
+                form.setValue(
+                  "minBid",
+                  Number(Number(form.getValues().minBid).toFixed(2))
+                )
+              }
+            />
+            {form.formState.errors.minBid && (
+              <p className="text-red-500">
+                {form.formState.errors.minBid.message}
+              </p>
+            )}
+          </div>
+          <div className="mb-4">
+            {serverError && <p className="text-red-500">{serverError}</p>}
+          </div>
+
+          <div className="flex items-center">
+            <Button
+              size="lg"
+              type="submit"
+              aria-label="proceed to updating the lot"
+            >
+              <div className="w-14 text-[18px]">
+                {isLotUpdating ? (
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                ) : (
+                  "Update"
+                )}
+              </div>
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

@@ -8,12 +8,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { type TCreateLotSchema, createLotSchema } from "@/lib/types";
 import { computeSHA256 } from "@/lib/utils";
 import { Cloud, File, FileX, Loader2 } from "lucide-react";
-import { Form } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { trpc } from "@/app/_trpc/client";
 import { useToast } from "../ui/use-toast";
 import { getSignedURLForLot } from "@/app/dashboard/auctions/actions";
 import { useDropzone } from "react-dropzone";
 import { CATEGORIES, MAX_NUM_IMGS } from "@/lib/constants";
+import { Textarea } from "../ui/textarea";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type CreateLotButtonProps = {
   auctionId: string;
@@ -176,9 +193,8 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             >
               Title
             </label>
-            <input
+            <Input
               {...form.register("title")}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="title"
               type="text"
               placeholder="Title"
@@ -196,11 +212,12 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             >
               Description
             </label>
-            <textarea
+            <Textarea
               {...form.register("description")}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              rows={1}
               id="description"
               placeholder="Describe your product"
+              maxRows={4}
             />
             {form.formState.errors.description && (
               <p className="text-red-500">
@@ -209,25 +226,34 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             )}
           </div>
           <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="description"
-            >
-              Category
-            </label>
-
-            <select
-              {...form.register("category")}
-              aria-label="Choose a category"
-              style={{ maxWidth: "500px" }}
-            >
-              {CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Category</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="w-[280px]">
+                        <SelectValue placeholder="Choose a category" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        {CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
             {form.formState.errors.category && (
               <p className="text-red-500">
                 {form.formState.errors.category.message}
@@ -242,9 +268,9 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             >
               Minimal Bid
             </label>
-            <input
+            <Input
               {...form.register("minBid", { valueAsNumber: true })}
-              className="remove-arrow shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="remove-arrow"
               id="minBid"
               type="number"
               step=".01"

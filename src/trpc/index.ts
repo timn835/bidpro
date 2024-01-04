@@ -13,7 +13,11 @@ import {
   updateLotSchema,
 } from "@/lib/types";
 import { deleteImagesFromS3 } from "@/lib/utils";
-import { CATEGORIES, INFINITE_QUERY_LIMIT } from "@/lib/constants";
+import {
+  CATEGORIES,
+  INFINITE_QUERY_LIMIT,
+  MAX_NUM_LOTS_PER_AUCTION,
+} from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 
 export const appRouter = router({
@@ -89,7 +93,7 @@ export const appRouter = router({
 
   updateAuction: privateAdminProcedure
     .input(updateAuctionSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       // check that the auction to update exists
       const auctionToUpdate = await db.auction.findFirst({
         where: { id: input.auctionId },
@@ -178,11 +182,20 @@ export const appRouter = router({
     }),
 
   getAuctionLots: publicProcedure
-    .input(z.object({ auctionId: z.string() }))
+    .input(
+      z.object({
+        auctionId: z.string(),
+        limit: z.number().min(1).max(MAX_NUM_LOTS_PER_AUCTION).nullish(),
+        cursor: z.string().nullish(),
+      })
+    )
     .query(async ({ input }) => {
-      return await db.lot.findMany({
+      const { auctionId, cursor } = input;
+      const limit = input.limit ?? INFINITE_QUERY_LIMIT;
+
+      const lots = await db.lot.findMany({
         where: {
-          auctionId: input.auctionId,
+          auctionId,
         },
         orderBy: {
           lotNumber: "desc",
@@ -192,8 +205,20 @@ export const appRouter = router({
             select: { Bid: true },
           },
         },
-        take: 20,
+        cursor: cursor ? { id: cursor } : undefined,
+        take: limit + 1,
       });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (lots.length > limit) {
+        const nextItem = lots.pop();
+        nextCursor = nextItem?.id;
+      }
+
+      return {
+        lots,
+        nextCursor,
+      };
     }),
 
   getLot: publicProcedure
@@ -253,7 +278,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "BAD_REQUEST" });
 
       // make sure that there are no more than 100 lots
-      if (auction._count.Lot > 99) {
+      if (auction._count.Lot >= MAX_NUM_LOTS_PER_AUCTION) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 

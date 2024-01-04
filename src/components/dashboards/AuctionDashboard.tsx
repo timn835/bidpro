@@ -3,6 +3,7 @@
 import UploadImageButton from "@/components/action_buttons/UploadImageButton";
 import UpdateAuctionButton from "@/components/action_buttons/UpdateAuctionButton";
 import { format } from "date-fns";
+import { useInView } from "react-intersection-observer";
 import Image from "next/image";
 import DeleteAuctionButton from "@/components/action_buttons/DeleteAuctionButton";
 import CreateLotButton from "@/components/action_buttons/CreateLotButton";
@@ -10,20 +11,20 @@ import { type Auction } from "@prisma/client";
 import { trpc } from "@/app/_trpc/client";
 import { Loader2, Trash } from "lucide-react";
 import { Button } from "../ui/button";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import AuctionDashboardLotCard from "../AuctionDashboardLotCard";
+import { INFINITE_QUERY_LIMIT } from "@/lib/constants";
 
 type AuctionDashboardProps = {
   auction: Auction;
 };
 
 const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
+  const { ref, inView } = useInView();
   const [currentlyDeletingLot, setCurrentlyDeletingLot] = useState<
     string | null
   >(null);
   const utils = trpc.useUtils();
-  const { data: lots, isLoading: areLotsLoading } =
-    trpc.getAuctionLots.useQuery({ auctionId: auction.id });
 
   const { mutate: deleteLot } = trpc.deleteLot.useMutation({
     onSuccess: () => {
@@ -36,6 +37,34 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
       setCurrentlyDeletingLot(null);
     },
   });
+
+  const {
+    data,
+    isLoading: areLotsLoading,
+    isError: isErrorLoadingLots,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+  } = trpc.getAuctionLots.useInfiniteQuery(
+    {
+      auctionId: auction.id,
+      limit: INFINITE_QUERY_LIMIT,
+    },
+    {
+      getNextPageParam: (lastPage) => lastPage?.nextCursor,
+      keepPreviousData: true,
+      retry: false,
+    }
+  );
+
+  const lots = data?.pages.flatMap((page) => page.lots);
+
+  useEffect(() => {
+    if (inView && hasNextPage) {
+      fetchNextPage();
+    }
+  }, [inView, fetchNextPage, hasNextPage]);
+
   return (
     <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
       <div className="mx-auto w-full grow lg:flex xl:px-2">
@@ -118,39 +147,27 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                 />
               </div>
               <div className="max-h-[70vh] overflow-auto">
-                {/* display auction lots */}
-                {lots && lots.length > 0 ? (
-                  <ul className="mt-8 flex flex-col gap-6 divide-y divide-zinc-200">
-                    {lots
-                      .sort(
-                        (a, b) =>
-                          new Date(b.createdAt).getTime() -
-                          new Date(a.createdAt).getTime()
-                      )
-                      .map((lot) => (
-                        <AuctionDashboardLotCard lot={lot} key={lot.id}>
-                          <Button
-                            size="sm"
-                            className="w-full"
-                            variant="destructive"
-                            onClick={() => {
-                              deleteLot({ id: lot.id });
-                            }}
-                          >
-                            {currentlyDeletingLot === lot.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </AuctionDashboardLotCard>
-                      ))}
-                  </ul>
-                ) : areLotsLoading ? (
+                {/* displaying auction lots */}
+
+                {/* are the lots loading? */}
+                {areLotsLoading && (
                   <div className="flex justify-center items-center h-[90vh]">
                     <Loader2 className="h-48 w-48 animate-spin text-zinc-300" />
                   </div>
-                ) : (
+                )}
+
+                {/* was there an error loading the lots? */}
+                {isErrorLoadingLots && (
+                  <div className="mt-16 flex flex-col items-center gap-2 bg-red-100 text-red-400 rounded-md">
+                    <h3 className="font-semibold text-xl">
+                      Something went wrong while fetching the lots.
+                    </h3>
+                    <p>Please try again later</p>
+                  </div>
+                )}
+
+                {/* do we not yet have any lots available? */}
+                {lots && lots.length === 0 && (
                   <div className="mt-16 flex flex-col items-center gap-2">
                     <h3 className="font-semibold text-xl">
                       This auction does not have any lots at the moment.
@@ -158,6 +175,50 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                     <p>Create your first one!</p>
                   </div>
                 )}
+
+                {/* display the lots you have with infinite scroll */}
+                {data && lots && lots!.length > 0 && (
+                  <ul className="mt-8 flex flex-col gap-6 divide-y divide-zinc-200">
+                    {data.pages.map((page) => (
+                      <Fragment key={page.nextCursor ?? "lastPage"}>
+                        {page.lots.map((lot) => (
+                          <AuctionDashboardLotCard lot={lot} key={lot.id}>
+                            <Button
+                              size="sm"
+                              className="w-full"
+                              variant="destructive"
+                              onClick={() => {
+                                deleteLot({ id: lot.id });
+                              }}
+                            >
+                              {currentlyDeletingLot === lot.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </AuctionDashboardLotCard>
+                        ))}
+                      </Fragment>
+                    ))}
+                  </ul>
+                )}
+
+                {/* are we fetching next page? */}
+                {isFetchingNextPage && (
+                  <div className="w-full mt-4 max-w-xs mx-auto">
+                    <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-centr pt-2">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Loading...
+                    </div>
+                  </div>
+                )}
+
+                <span style={{ visibility: "hidden" }} ref={ref}>
+                  intersection observer marker
+                </span>
+
+                {/* end of displaying auction lots */}
               </div>
             </div>
           </div>

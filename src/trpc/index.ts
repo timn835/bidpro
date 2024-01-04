@@ -13,7 +13,7 @@ import {
   updateLotSchema,
 } from "@/lib/types";
 import { deleteImagesFromS3 } from "@/lib/utils";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORIES, INFINITE_QUERY_LIMIT } from "@/lib/constants";
 import { revalidatePath } from "next/cache";
 
 export const appRouter = router({
@@ -184,6 +184,9 @@ export const appRouter = router({
         where: {
           auctionId: input.auctionId,
         },
+        orderBy: {
+          lotNumber: "desc",
+        },
         include: {
           _count: {
             select: { Bid: true },
@@ -251,7 +254,6 @@ export const appRouter = router({
 
       // make sure that there are no more than 100 lots
       if (auction._count.Lot > 99) {
-        console.log(auction._count.Lot);
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
 
@@ -339,6 +341,7 @@ export const appRouter = router({
         select: {
           Auction: {
             select: {
+              id: true,
               userId: true,
             },
           },
@@ -365,6 +368,7 @@ export const appRouter = router({
       // update the lot numbers
       await db.lot.updateMany({
         where: {
+          auctionId: lot.Auction!.id,
           lotNumber: {
             gt: lot.lotNumber,
           },

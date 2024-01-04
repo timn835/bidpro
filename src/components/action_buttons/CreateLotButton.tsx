@@ -108,6 +108,8 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
     trpc.createLot.useMutation({
       onSuccess: async (newLot) => {
         if (!files || !files.length) {
+          utils.getAuctionLots.invalidate({ auctionId });
+          setIsUploading(false);
           setIsOpen(false);
           return;
         }
@@ -155,7 +157,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
           setIsUploading(false);
           return;
         }
-        utils.getAuctionLots.invalidate();
+        utils.getAuctionLots.invalidate({ auctionId });
         setIsUploading(false);
         setIsOpen(false);
       },

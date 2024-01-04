@@ -14,7 +14,6 @@ import {
 } from "@/lib/types";
 import { deleteImagesFromS3 } from "@/lib/utils";
 import {
-  CATEGORIES,
   INFINITE_QUERY_LIMIT,
   MAX_NUM_LOTS_PER_AUCTION,
 } from "@/lib/constants";
@@ -47,7 +46,7 @@ export const appRouter = router({
   }),
 
   getUserAuctions: privateAdminProcedure.query(async ({ ctx }) => {
-    const { userId, user } = ctx;
+    const { userId } = ctx;
 
     return await db.auction.findMany({
       where: {
@@ -220,14 +219,14 @@ export const appRouter = router({
       }
 
       // get blur image urls
-      const base64Promises = lots.map((lot) =>
-        lot.mainImgUrl ? getBase64(lot.mainImgUrl) : "/standard-lot-small.jpg"
-      );
-      const blurImgUrls = await Promise.all(base64Promises);
+      // const base64Promises = lots.map((lot) =>
+      //   lot.mainImgUrl ? getBase64(lot.mainImgUrl) : "/standard-lot-small.jpg"
+      // );
+      // const blurImgUrls = await Promise.all(base64Promises);
 
       return {
         lots,
-        blurImgUrls,
+        // blurImgUrls,
         nextCursor,
       };
     }),

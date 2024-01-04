@@ -52,7 +52,7 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
     },
     {
       getNextPageParam: (lastPage) => lastPage?.nextCursor,
-      keepPreviousData: true,
+      // keepPreviousData: true,
       retry: false,
     }
   );
@@ -184,9 +184,9 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                         {page.lots.map((lot, i) => (
                           <AuctionDashboardLotCard
                             lot={lot}
-                            blurImgUrl={
-                              page.blurImgUrls[i] ?? "/standard-lot-small.jpg"
-                            }
+                            // blurImgUrl={
+                            //   page.blurImgUrls[i] ?? "/standard-lot-small.jpg"
+                            // }
                             key={lot.id}
                           >
                             <Button

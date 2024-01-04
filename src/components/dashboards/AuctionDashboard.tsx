@@ -181,8 +181,14 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                   <ul className="mt-8 flex flex-col gap-6 divide-y divide-zinc-200">
                     {data.pages.map((page) => (
                       <Fragment key={page.nextCursor ?? "lastPage"}>
-                        {page.lots.map((lot) => (
-                          <AuctionDashboardLotCard lot={lot} key={lot.id}>
+                        {page.lots.map((lot, i) => (
+                          <AuctionDashboardLotCard
+                            lot={lot}
+                            blurImgUrl={
+                              page.blurImgUrls[i] ?? "/standard-lot-small.jpg"
+                            }
+                            key={lot.id}
+                          >
                             <Button
                               size="sm"
                               className="w-full"

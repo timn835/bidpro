@@ -7,6 +7,7 @@ import { ReactNode } from "react";
 
 type AuctionDashboardLotCardProps = {
   lot: Lot;
+  blurImgUrl: string;
   children: ReactNode;
 };
 
@@ -24,6 +25,7 @@ type Lot = {
 
 const AuctionDashboardLotCard = ({
   lot,
+  blurImgUrl,
   children,
 }: AuctionDashboardLotCardProps) => {
   return (
@@ -40,10 +42,9 @@ const AuctionDashboardLotCard = ({
               fill
               style={{ objectFit: "cover" }}
               sizes={"200px"}
-              // objectPosition="top"
-              // width={100}
-              // height={100}
               className="rounded-full"
+              placeholder="blur"
+              blurDataURL={blurImgUrl}
             />
           </div>
 

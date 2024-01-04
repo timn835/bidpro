@@ -193,6 +193,10 @@ export const appRouter = router({
       const { auctionId, cursor } = input;
       const limit = input.limit ?? INFINITE_QUERY_LIMIT;
 
+      console.log("fetching...: ");
+      console.log("cursor: ", cursor);
+      console.log("limit: ", limit);
+
       const lots = await db.lot.findMany({
         where: {
           auctionId,
@@ -215,8 +219,15 @@ export const appRouter = router({
         nextCursor = nextItem?.id;
       }
 
+      // get blur image urls
+      const base64Promises = lots.map((lot) =>
+        lot.mainImgUrl ? getBase64(lot.mainImgUrl) : "/standard-lot-small.jpg"
+      );
+      const blurImgUrls = await Promise.all(base64Promises);
+
       return {
         lots,
+        blurImgUrls,
         nextCursor,
       };
     }),

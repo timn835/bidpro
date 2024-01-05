@@ -50,15 +50,15 @@ export const calcRemainingTime = (
 
 export const deleteImagesFromS3 = async (images: Image[]) => {
   const s3 = new S3Client({
-    region: process.env.AWS_BUCKET_REGION!,
+    region: process.env.MY_AWS_BUCKET_REGION!,
     credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+      accessKeyId: process.env.MY_AWS_ACCESS_KEY!,
+      secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
     },
   });
   const deleteImagePromises = images.map(async (image) => {
     const deleteObjectCommand = new DeleteObjectCommand({
-      Bucket: process.env.AWS_BUCKET_NAME,
+      Bucket: process.env.MY_AWS_BUCKET_NAME,
       Key: image.imgUrl.split("/").pop(),
     });
     await s3.send(deleteObjectCommand);

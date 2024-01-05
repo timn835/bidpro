@@ -1,5 +1,10 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { privateAdminProcedure, publicProcedure, router } from "./trpc";
+import {
+  privateAdminProcedure,
+  privateUserProcedure,
+  publicProcedure,
+  router,
+} from "./trpc";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { z } from "zod";
@@ -12,12 +17,14 @@ import {
   updateAuctionSchema,
   updateLotSchema,
 } from "@/lib/types";
-import { deleteImagesFromS3 } from "@/lib/utils";
+import { absoluteUrl, deleteImagesFromS3 } from "@/lib/utils";
 import {
   INFINITE_QUERY_LIMIT,
   MAX_NUM_LOTS_PER_AUCTION,
 } from "@/config/constants";
 import { revalidatePath } from "next/cache";
+import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
+import { PLANS } from "@/config/stripe";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -161,14 +168,14 @@ export const appRouter = router({
       // delete image from s3
       try {
         const s3 = new S3Client({
-          region: process.env.AWS_BUCKET_REGION!,
+          region: process.env.MY_AWS_BUCKET_REGION!,
           credentials: {
-            accessKeyId: process.env.AWS_ACCESS_KEY!,
-            secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+            accessKeyId: process.env.MY_AWS_ACCESS_KEY!,
+            secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY!,
           },
         });
         const deleteObjectCommand = new DeleteObjectCommand({
-          Bucket: process.env.AWS_BUCKET_NAME,
+          Bucket: process.env.MY_AWS_BUCKET_NAME,
           Key: auction.imgUrl.split("/").pop(),
         });
         await s3.send(deleteObjectCommand);
@@ -415,6 +422,53 @@ export const appRouter = router({
       await deleteImagesFromS3(lot.LotImage);
       return lot;
     }),
+
+  createStripeSession: privateUserProcedure.mutation(async ({ ctx }) => {
+    const { userId } = ctx;
+
+    const billingUrl = absoluteUrl("/dashboard/billing");
+
+    if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!dbUser) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+    const subscriptionPlan = await getUserSubscriptionPlan();
+
+    if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
+      const stripeSession = await stripe.billingPortal.sessions.create({
+        customer: dbUser.stripeCustomerId,
+        return_url: billingUrl,
+      });
+
+      return { url: stripeSession.url };
+    }
+
+    const stripeSession = await stripe.checkout.sessions.create({
+      success_url: billingUrl,
+      cancel_url: billingUrl,
+      payment_method_types: ["card"],
+      mode: "subscription",
+      billing_address_collection: "auto",
+      line_items: [
+        {
+          price: PLANS.find((plan) => plan.name === "Admin")?.price.priceIds
+            .test,
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        userId: userId,
+      },
+    });
+
+    return { url: stripeSession.url };
+  }),
 
   // ...
 });

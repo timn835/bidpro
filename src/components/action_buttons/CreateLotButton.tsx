@@ -19,7 +19,7 @@ import { trpc } from "@/app/_trpc/client";
 import { useToast } from "../ui/use-toast";
 import { getSignedURLForLot } from "@/app/dashboard/auctions/actions";
 import { useDropzone } from "react-dropzone";
-import { CATEGORIES, MAX_NUM_IMGS } from "@/lib/constants";
+import { CATEGORIES, MAX_NUM_IMGS } from "@/config/constants";
 import { Textarea } from "../ui/textarea";
 import { Input } from "../ui/input";
 import {

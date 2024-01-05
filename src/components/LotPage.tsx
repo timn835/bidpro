@@ -9,7 +9,7 @@ import ImageSlider from "./ImageSlider";
 import UpdateLotButton from "./action_buttons/UpdateLotButton";
 import RemoveImagesButton from "./action_buttons/RemoveImagesButton";
 import AddImagesButton from "./action_buttons/AddImagesButton";
-import { MAX_NUM_IMGS } from "@/lib/constants";
+import { MAX_NUM_IMGS } from "@/config/constants";
 import DeleteLotButton from "./action_buttons/DeleteLotButton";
 
 type LotPageProps = {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CATEGORIES } from "./constants";
+import { CATEGORIES } from "../config/constants";
 
 export const createAuctionSchema = z
   .object({

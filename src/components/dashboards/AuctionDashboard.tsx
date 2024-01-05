@@ -13,7 +13,7 @@ import { Loader2, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 import { Fragment, useEffect, useState } from "react";
 import AuctionDashboardLotCard from "../AuctionDashboardLotCard";
-import { INFINITE_QUERY_LIMIT } from "@/lib/constants";
+import { INFINITE_QUERY_LIMIT } from "@/config/constants";
 
 type AuctionDashboardProps = {
   auction: Auction;

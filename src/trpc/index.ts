@@ -16,15 +16,16 @@ import { deleteImagesFromS3 } from "@/lib/utils";
 import {
   INFINITE_QUERY_LIMIT,
   MAX_NUM_LOTS_PER_AUCTION,
-} from "@/lib/constants";
+} from "@/config/constants";
 import { revalidatePath } from "next/cache";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession();
     const user = await getUser();
-    if (!user || !user.id || !user.email)
+    if (!user || !user.id || !user.email) {
       throw new TRPCError({ code: "UNAUTHORIZED" });
+    }
 
     // check if the user is in the database
     const dbUser = await db.user.findFirst({
@@ -191,11 +192,6 @@ export const appRouter = router({
     .query(async ({ input }) => {
       const { auctionId, cursor } = input;
       const limit = input.limit ?? INFINITE_QUERY_LIMIT;
-
-      console.log("fetching...: ");
-      console.log("cursor: ", cursor);
-      console.log("limit: ", limit);
-
       const lots = await db.lot.findMany({
         where: {
           auctionId,

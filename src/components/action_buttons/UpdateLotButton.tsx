@@ -9,7 +9,7 @@ import { type TUpdateLotSchema, updateLotSchema } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
 import { trpc } from "@/app/_trpc/client";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORIES } from "@/config/constants";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";

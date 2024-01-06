@@ -4,6 +4,7 @@ import { twMerge } from "tailwind-merge";
 import { Image } from "./types";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
+import { type Metadata } from "next";
 
 // difference between lots ending in seconds
 const LOT_TIME_DELTA = 30;
@@ -93,4 +94,48 @@ export function absoluteUrl(path: string) {
   if (typeof window !== "undefined") return path;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${path}`;
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
+}
+
+export function constructMetadata({
+  title = "BidPro - Auctioning Platform",
+  description = "BidPro is an online platform where users can create auctions, upload lots and bid.",
+  image = "/thumbnail.png",
+  icons = "/favicon.ico",
+  noIndex = false,
+}: {
+  title?: string;
+  description?: string;
+  image?: string;
+  icons?: string;
+  noIndex?: boolean;
+} = {}): Metadata {
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: image,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+      creator: "@timn835",
+    },
+    icons,
+    metadataBase: new URL("https://bidpro.vercel.app/"),
+    themeColor: "#FFF",
+    ...(noIndex && {
+      robots: {
+        index: false,
+        follow: false,
+      },
+    }),
+  };
 }

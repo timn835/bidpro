@@ -263,11 +263,14 @@ export const appRouter = router({
       if (!lot) throw new TRPCError({ code: "NOT_FOUND" });
 
       // get blur image urls
-      const base64Promises = lot.LotImage.map((image) =>
-        getBase64(image.imgUrl)
-      );
-      const blurImgUrls = await Promise.all(base64Promises);
-      return { lot, blurImgUrls };
+      // const base64Promises = lot.LotImage.map((image) =>
+      //   getBase64(image.imgUrl)
+      // );
+      // const blurImgUrls = await Promise.all(base64Promises);
+      return {
+        lot,
+        blurImgUrls: lot.LotImage.map((_) => "standard-lot-small.jpg"),
+      };
     }),
 
   createLot: privateAdminProcedure

@@ -22,8 +22,8 @@ const Page = () => {
         router.push("/api/auth/login");
       }
     },
-    // retry: true,
-    // retryDelay: 2000,
+    retry: true,
+    retryDelay: 2000,
   });
   return (
     <div className="w-full mt-24 flex justify-center">

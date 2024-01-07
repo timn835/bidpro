@@ -130,7 +130,6 @@ export function constructMetadata({
     },
     icons,
     metadataBase: new URL("https://bidpro.vercel.app/"),
-    themeColor: "#FFF",
     ...(noIndex && {
       robots: {
         index: false,

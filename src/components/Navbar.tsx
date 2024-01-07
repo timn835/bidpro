@@ -71,6 +71,15 @@ const Navbar = async () => {
                 >
                   Dashboard
                 </Link>
+                <Link
+                  href="/auctions"
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "sm",
+                  })}
+                >
+                  Auctions
+                </Link>
                 <UserAccountNav
                   name={
                     !user.given_name || !user.family_name

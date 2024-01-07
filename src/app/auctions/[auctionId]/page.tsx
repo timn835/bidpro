@@ -1,22 +1,35 @@
-import AuctionHeader from "@/components/AuctionHeader";
-import LotsFeed from "@/components/LotsFeed";
-import { db } from "@/db";
-import { getBase64 } from "@/trpc";
 import { notFound } from "next/navigation";
+import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
+import { db } from "@/db";
 import { Suspense } from "react";
 import Skeleton from "react-loading-skeleton";
+import AuctionHeader from "@/components/AuctionHeader";
+import LotsFeed from "@/components/LotsFeed";
 
-export type PageProps = {
-  params: { [key: string]: string | string[] | undefined };
-  searchParams?: { [key: string]: string | string[] | undefined };
+type PageProps = {
+  params: {
+    auctionId: string;
+  };
 };
 
-const fetchAuctionInfo = async (auctionId: string) => {
+const Page = async ({ params }: PageProps) => {
+  const { auctionId } = params;
+  if (!auctionId) return notFound();
+
   const auction = await db.auction.findFirst({
-    where: {
-      id: auctionId,
-    },
-    include: {
+    where: { id: auctionId },
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      startsAt: true,
+      endsAt: true,
+      imgUrl: true,
+      User: {
+        select: {
+          id: true,
+        },
+      },
       _count: {
         select: {
           Lot: true,
@@ -24,28 +37,23 @@ const fetchAuctionInfo = async (auctionId: string) => {
       },
     },
   });
-
-  // fetch blur image
-  const blurImgUrl = auction?.imgUrl
-    ? await getBase64(auction.imgUrl)
-    : "/standard-auction-small.jpg";
-  return { auction, blurImgUrl };
-};
-
-const Page = async (props: PageProps) => {
-  const auctionId = props.params.auctionId;
-  if (typeof auctionId !== "string") return notFound();
-
-  const { auction, blurImgUrl } = await fetchAuctionInfo(auctionId);
   if (!auction) return notFound();
+  auction;
+
+  const { getUser } = getKindeServerSession();
+  const user = await getUser();
+
   return (
     <main>
       <Suspense fallback={<Skeleton height={100} className="my-2" count={1} />}>
-        <AuctionHeader auction={auction} blurImgUrl={blurImgUrl!} />
+        <AuctionHeader auction={auction} />
       </Suspense>
-      <Suspense fallback={<Skeleton height={100} className="my-2" count={3} />}>
-        <LotsFeed {...props} />
-      </Suspense>
+      <LotsFeed
+        auctionId={auction.id}
+        visitorId={user?.id ?? ""}
+        numOfLots={auction._count.Lot}
+        disableBid={user?.id === auction!.User!.id}
+      />
     </main>
   );
 };

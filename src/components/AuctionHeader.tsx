@@ -10,10 +10,10 @@ type AuctionHeaderProps = {
     endsAt: Date;
     imgUrl: string | null;
     _count: { Lot: number };
+    User: { id: string } | null;
   };
-  blurImgUrl: string;
 };
-const AuctionHeader = ({ auction, blurImgUrl }: AuctionHeaderProps) => {
+const AuctionHeader = ({ auction }: AuctionHeaderProps) => {
   return (
     <div className="text-zinc-600 rounded-xl bg-white shadow-lg mx-6 mt-6 text-center flex flex-col sm:flex-row items-center justify-around">
       <div className="relative h-96 w-96 my-6">
@@ -24,8 +24,8 @@ const AuctionHeader = ({ auction, blurImgUrl }: AuctionHeaderProps) => {
           style={{ objectFit: "cover" }}
           sizes={"300px"}
           className="rounded-md"
-          placeholder="blur"
-          blurDataURL={blurImgUrl}
+          // placeholder="blur"
+          // blurDataURL={blurImgUrl}
         />
       </div>
       <div className="flex flex-col justify-center items-center gap-y-5 p-4">

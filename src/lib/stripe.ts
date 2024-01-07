@@ -20,7 +20,7 @@ export async function getUserSubscriptionPlan() {
     };
   }
 
-  if (user.id) {
+  if (!user.id) {
     return {
       ...PLANS[0],
       isSubscribed: false,

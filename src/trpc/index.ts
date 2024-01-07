@@ -188,7 +188,7 @@ export const appRouter = router({
       return auction;
     }),
 
-  getAuctionLots: publicProcedure
+  getAuctionLots: privateAdminProcedure
     .input(
       z.object({
         auctionId: z.string(),
@@ -232,6 +232,41 @@ export const appRouter = router({
         // blurImgUrls,
         nextCursor,
       };
+    }),
+
+  getPublicAuctionLots: publicProcedure
+    .input(
+      z.object({
+        auctionId: z.string().nullish(),
+        pageNumber: z.number().min(1).max(10).nullish(),
+        lotsPerPage: z.number().min(5).max(20).nullish(),
+      })
+    )
+    .query(async ({ input }) => {
+      const { auctionId } = input;
+      const pageNumber = input.pageNumber ?? 1;
+      const lotsPerPage = input.lotsPerPage ?? 10;
+
+      const lots = await db.lot.findMany({
+        where: {
+          auctionId,
+        },
+        include: {
+          _count: {
+            select: {
+              Bid: true,
+            },
+          },
+          Auction: {
+            select: {
+              endsAt: true,
+            },
+          },
+        },
+        take: lotsPerPage,
+        skip: (pageNumber - 1) * lotsPerPage,
+      });
+      return lots;
     }),
 
   getLot: publicProcedure

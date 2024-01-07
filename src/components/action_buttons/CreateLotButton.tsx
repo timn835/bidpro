@@ -220,6 +220,7 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
               id="description"
               placeholder="Describe your product"
               maxRows={4}
+              className="resize-none"
             />
             {form.formState.errors.description && (
               <p className="text-red-500">

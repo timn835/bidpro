@@ -86,6 +86,7 @@ function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
   useEffect(() => {
     if (lot.auctionId) form.setValue("auctionId", lot.auctionId);
     form.setValue("lotId", lot.id);
+    form.setValue("category", CATEGORIES.find((el) => el === lot.category)!);
   }, [lot, form]);
 
   const onSubmit = (data: TUpdateLotSchema) => {

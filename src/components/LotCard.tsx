@@ -22,13 +22,13 @@ type LotCardProps = {
     mainImgUrl: string | null;
     _count: { Bid: number };
     Auction: {
-      endsAt: Date;
+      endsAt: string;
     } | null;
   };
-  blurImgUrl: string;
+  disableBid: boolean;
 };
 
-const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
+const LotCard = ({ lot, disableBid }: LotCardProps) => {
   const formattedMinBid = USDollar.format(lot.minBid);
   return (
     <Card className="overflow-hidden rounded-xl bg-white shadow-lg flex flex-col justify-between max-w-[250px] h-[530px]">
@@ -46,8 +46,6 @@ const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
               style={{ objectFit: "cover" }}
               sizes={"200px"}
               className="rounded-full"
-              placeholder="blur"
-              blurDataURL={blurImgUrl}
               loading="lazy"
             />
           </div>
@@ -69,11 +67,11 @@ const LotCard = ({ lot, blurImgUrl }: LotCardProps) => {
         </p>
         <p className="text-zinc-600">Time remaining:</p>
         <p className="font-semibold text-zinc-900 text-center">
-          {calcRemainingTime(lot.Auction?.endsAt.toISOString(), lot.lotNumber)}
+          {calcRemainingTime(lot.Auction?.endsAt, lot.lotNumber)}
         </p>
       </CardContent>
       <CardFooter className="bg-gray-50 dark:bg-zinc-900">
-        <Button size="lg" className="w-full">
+        <Button size="lg" className="w-full" disabled={disableBid}>
           Bid {formattedMinBid}
         </Button>
       </CardFooter>

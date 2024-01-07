@@ -1,13 +1,13 @@
 import LotPage from "@/components/LotPage";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
-interface PageProps {
+type PageProps = {
   params: {
     lotId: string;
   };
-}
+};
 
 const Page = async ({ params }: PageProps) => {
   // retrieve auction id

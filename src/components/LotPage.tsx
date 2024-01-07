@@ -89,7 +89,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
               <DeleteLotButton lotId={lot.id} auctionId={lot.Auction!.id} />
             </>
           ) : (
-            <Button>Bid</Button>
+            <Button className="w-32">Bid</Button>
           )}
         </div>
         <div className="w-full p-2 rounded-md gap-2 bg-white divide-y-2">

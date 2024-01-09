@@ -11,6 +11,7 @@ import RemoveImagesButton from "./action_buttons/RemoveImagesButton";
 import AddImagesButton from "./action_buttons/AddImagesButton";
 import { MAX_NUM_IMGS } from "@/config/constants";
 import DeleteLotButton from "./action_buttons/DeleteLotButton";
+import { useState } from "react";
 
 type LotPageProps = {
   lotId: string;
@@ -18,6 +19,9 @@ type LotPageProps = {
 };
 
 const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
+  // the state will keep track of the image slider
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const {
     data,
     isLoading: isLotLoading,
@@ -43,6 +47,8 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           </h1>
         </div>
         <ImageSlider
+          currentIndex={currentIndex}
+          setCurrentIndex={setCurrentIndex}
           imgBlurUrls={blurImgUrls}
           imgUrls={
             lot.LotImage.length > 0
@@ -83,6 +89,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
               />
               <RemoveImagesButton
                 images={lot.LotImage}
+                setCurrentIndex={setCurrentIndex}
                 refetch={refetch}
                 disabled={lot.LotImage.length === 0}
               />

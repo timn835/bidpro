@@ -67,7 +67,7 @@ type UpdateLotFormProps = {
 };
 
 function UpdateLotForm({ lot, refetch, setIsOpen }: UpdateLotFormProps) {
-  const [serverError, setServerError] = useState("");
+  const [serverError, setServerError] = useState<string>("");
   const { mutate: updateLot, isLoading: isLotUpdating } =
     trpc.updateLot.useMutation({
       onSuccess: () => {

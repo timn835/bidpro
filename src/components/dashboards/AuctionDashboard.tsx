@@ -17,9 +17,10 @@ import { INFINITE_QUERY_LIMIT } from "@/config/constants";
 
 type AuctionDashboardProps = {
   auction: Auction;
+  numOfLots: number;
 };
 
-const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
+const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
   const { ref, inView } = useInView();
   const [currentlyDeletingLot, setCurrentlyDeletingLot] = useState<
     string | null
@@ -106,15 +107,7 @@ const AuctionDashboard = ({ auction }: AuctionDashboardProps) => {
                   </p>
                   <p className="mb-4 truncate">
                     <span className="font-bold">Total # of lots: </span>
-                    {lots ? lots.length : 0}
-                  </p>
-                  <p className="mb-4 truncate">
-                    <span className="font-bold">Total # of bids: </span>
-                    To be implemented...
-                  </p>
-                  <p className="mb-4 truncate">
-                    <span className="font-bold">Most popular lot: </span>
-                    To be implemented...
+                    {numOfLots}
                   </p>
                 </div>
                 <div className="border-b border-t border-zinc-200">

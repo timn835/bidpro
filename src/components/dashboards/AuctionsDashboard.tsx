@@ -3,14 +3,14 @@
 import { trpc } from "@/app/_trpc/client";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
-import { Layers3, Loader2, Plus, Trash } from "lucide-react";
+import { GavelIcon, Layers3, Loader2, Plus, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import CreateNewAuctionButton from "../action_buttons/CreateNewAuctionButton";
 import Image from "next/image";
 
-const AdminDashboard = () => {
+const AuctionsDashboard = () => {
   const [currentlyDeletingAuction, setCurrentlyDeletingAuction] = useState<
     string | null
   >(null);
@@ -66,9 +66,6 @@ const AdminDashboard = () => {
                         fill
                         style={{ objectFit: "cover" }}
                         sizes={"200px"}
-                        // objectPosition="top"
-                        // width={100}
-                        // height={100}
                         className="rounded-full"
                       />
                     </div>
@@ -96,6 +93,14 @@ const AdminDashboard = () => {
                             {format(new Date(auction.endsAt), "PPPP")}
                           </p>
                         </div>
+                        <div>
+                          <p>
+                            <span className="font-semibold">
+                              Number of lots:{" "}
+                            </span>
+                            {auction._count.Lot}
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -107,8 +112,12 @@ const AdminDashboard = () => {
                     {format(new Date(auction.createdAt), "MMM yyyy")}
                   </div>
                   <div className="flex items-center gap-2">
-                    <Layers3 className="h-4 w-4" />
-                    {auction._count.Lot} lots
+                    <Link href={`/dashboard/auctions/${auction.id}/bids`}>
+                      <Button size="sm" variant="secondary">
+                        <GavelIcon className="h-4 w-4 mr-1" />
+                        View Bids
+                      </Button>
+                    </Link>
                   </div>
                   <Button
                     size="sm"
@@ -143,4 +152,4 @@ const AdminDashboard = () => {
   );
 };
 
-export default AdminDashboard;
+export default AuctionsDashboard;

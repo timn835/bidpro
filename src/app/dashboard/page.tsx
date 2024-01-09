@@ -1,16 +1,7 @@
-import AdminDashboard from "@/components/dashboards/AdminDashboard";
-import UserDashboard from "@/components/dashboards/UserDashboard";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/db";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { HistoryIcon, WrenchIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 const page = async () => {
@@ -28,32 +19,48 @@ const page = async () => {
 
   return (
     <div>
-      <Link href="/dashboard/auctions">
-        <Card className="text-center m-4 overflow-hidden rounded-xl bg-white hover:shadow-lg hover:cursor-pointer flex items-center justify-around divide-x-2">
-          <CardHeader>
-            <CardTitle className="flex justify-center">
-              View Your Auctions
+      {dbUser.role === "ADMIN" ? (
+        <Link href="/dashboard/auctions">
+          <Card className="text-center m-4 overflow-hidden rounded-xl bg-white hover:shadow-lg transition hover:cursor-pointer flex items-center justify-around divide-x-2">
+            <CardHeader className="flex-1">
+              <CardTitle className="flex justify-center items-center">
+                <WrenchIcon
+                  size={50}
+                  className="m-4 text-zinc-600 hidden md:block"
+                />
+                Manage your Auctions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex justify-center pt-6">
+              <p>
+                Create, update or delete auctions, add lots to your existing
+                auctions, view auction bids and more!
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+      ) : null}
+      <Link href="/dashboard/bids">
+        <Card className="text-center m-4 overflow-hidden rounded-xl bg-white hover:shadow-lg transition hover:cursor-pointer flex items-center justify-around divide-x-2">
+          <CardHeader className="flex-1">
+            <CardTitle className="flex justify-center items-center">
+              <HistoryIcon
+                size={50}
+                className="m-4 text-zinc-600 hidden md:block"
+              />
+              View your Bids
             </CardTitle>
           </CardHeader>
-          <CardContent className="flex justify-center pt-6">
+          <CardContent className="flex-1 flex justify-center pt-6">
             <p>
-              Manage your auctions, add lots to your existing auctions and more!
+              View your past bids, see which bids are leading and which lots you
+              have won.
             </p>
           </CardContent>
         </Card>
       </Link>
-      {dbUser.role === "ADMIN" ? (
-        <div>Dashboard Card to lead to administer auctions</div>
-      ) : null}
-      {dbUser.role === "ADMIN" ? (
-        <div>Dashboard Card to lead to administer bids</div>
-      ) : null}
-      <div>Dashboard card to lead to user bid history</div>
     </div>
   );
-
-  // if (dbUser.role === "ADMIN") return <AdminDashboard />;
-  // return <UserDashboard />;
 };
 
 export default page;

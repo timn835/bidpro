@@ -26,14 +26,14 @@ type LotsFeedProps = {
   auctionId: string;
   visitorId: string;
   numOfLots: number;
-  disableBid: boolean;
+  disableBids: boolean;
 };
 
 const LotsFeed = ({
   visitorId,
   auctionId,
   numOfLots,
-  disableBid = false,
+  disableBids = false,
 }: LotsFeedProps) => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -169,8 +169,13 @@ const LotsFeed = ({
         </Pagination>
       </div>
       <div className="grid grid-cols-1 place-items-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {lots.map((lot, idx) => (
-          <LotCard key={lot.id} lot={lot} disableBid={disableBid} />
+        {lots.map((lot) => (
+          <LotCard
+            key={lot.id}
+            lot={lot}
+            disableBid={disableBids}
+            visitorId={visitorId}
+          />
         ))}
       </div>
     </div>

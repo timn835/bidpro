@@ -1,15 +1,20 @@
 import { ArrowBigLeft, ArrowBigRight, Dot } from "lucide-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import Image from "next/image";
 
 type ImageSliderProps = {
+  currentIndex: number;
+  setCurrentIndex: Dispatch<SetStateAction<number>>;
   imgUrls: string[];
   imgBlurUrls?: (string | null)[];
 };
 
-const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+const ImageSlider = ({
+  imgUrls,
+  currentIndex,
+  setCurrentIndex,
+}: ImageSliderProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const goToSlide = (slideIndex: number) => {
@@ -32,12 +37,12 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
               style={{ objectFit: "cover" }}
               sizes={"600px"}
               className="rounded-md"
-              placeholder="blur"
-              blurDataURL={
-                imgBlurUrls!.length > 0
-                  ? imgBlurUrls![currentIndex]!
-                  : "/standard-lot-small.jpg"
-              }
+              // placeholder="blur"
+              // blurDataURL={
+              //   imgBlurUrls!.length > 0
+              //     ? imgBlurUrls![currentIndex]!
+              //     : "/standard-lot-small.jpg"
+              // }
             />
           </div>
         </DialogTrigger>
@@ -50,12 +55,12 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
               style={{ objectFit: "cover" }}
               sizes={"2000px"}
               className="rounded-md"
-              placeholder="blur"
-              blurDataURL={
-                imgBlurUrls!.length > 0
-                  ? imgBlurUrls![currentIndex]!
-                  : "/standard-lot-small.jpg"
-              }
+              // placeholder="blur"
+              // blurDataURL={
+              //   imgBlurUrls!.length > 0
+              //     ? imgBlurUrls![currentIndex]!
+              //     : "/standard-lot-small.jpg"
+              // }
             />
           </div>
         </DialogContent>
@@ -83,7 +88,7 @@ const ImageSlider = ({ imgUrls, imgBlurUrls }: ImageSliderProps) => {
         />
       </div>
       <div className="flex top-4 justify-center py-2">
-        {imgUrls.map((slide, slideIndex) => (
+        {imgUrls.map((_, slideIndex) => (
           <div
             key={slideIndex}
             onClick={() => goToSlide(slideIndex)}

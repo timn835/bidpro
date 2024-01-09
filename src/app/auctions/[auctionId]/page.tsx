@@ -52,7 +52,7 @@ const Page = async ({ params }: PageProps) => {
         auctionId={auction.id}
         visitorId={user?.id ?? ""}
         numOfLots={auction._count.Lot}
-        disableBid={user?.id === auction!.User!.id}
+        disableBids={user?.id === auction!.User!.id}
       />
     </main>
   );

@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useState, Dispatch, SetStateAction } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { trpc } from "@/app/_trpc/client";
@@ -9,12 +9,14 @@ import Image from "next/image";
 type RemoveImagesButtonProps = {
   images: ImageType[];
   disabled: boolean;
+  setCurrentIndex: Dispatch<SetStateAction<number>>;
   refetch: () => void;
 };
 
 const RemoveImagesButton = ({
   images,
   disabled,
+  setCurrentIndex,
   refetch,
 }: RemoveImagesButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,6 +42,7 @@ const RemoveImagesButton = ({
         <RemoveImagesForm
           images={images}
           refetch={refetch}
+          setCurrentIndex={setCurrentIndex}
           setIsOpen={setIsOpen}
         />
       </DialogContent>
@@ -51,12 +54,14 @@ export default RemoveImagesButton;
 
 type RemoveImagesFormProps = {
   images: ImageType[];
+  setCurrentIndex: Dispatch<SetStateAction<number>>;
   refetch: () => void;
   setIsOpen: (value: boolean) => void;
 };
 
 const RemoveImagesForm = ({
   images,
+  setCurrentIndex,
   refetch,
   setIsOpen,
 }: RemoveImagesFormProps) => {
@@ -66,6 +71,7 @@ const RemoveImagesForm = ({
     trpc.removeImages.useMutation({
       onSuccess: () => {
         refetch();
+        setCurrentIndex(0);
         setIsOpen(false);
       },
       onError: (err) => {

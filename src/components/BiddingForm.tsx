@@ -1,6 +1,5 @@
-import { TUpdateLotSchema } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Form } from "./ui/form";
@@ -8,7 +7,8 @@ import { Input } from "./ui/input";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Loader2 } from "lucide-react";
-import { USDollar } from "@/lib/utils";
+import { trpc } from "@/app/_trpc/client";
+import { MAX_NEXT_BID_DELTA } from "@/config/constants";
 
 type BiddingFormProps = {
   lotId: string;
@@ -16,8 +16,8 @@ type BiddingFormProps = {
   lotNumber: number;
   minBid: number;
   numOfBids: number;
-  visitorId: string;
   imgUrl: string;
+  setIsOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 const BiddingForm = ({
@@ -26,17 +26,27 @@ const BiddingForm = ({
   lotNumber,
   minBid,
   numOfBids,
-  visitorId,
   imgUrl,
+  setIsOpen,
 }: BiddingFormProps) => {
   const [serverError, setServerError] = useState<string>("");
+  const { mutate: placeBid, isLoading: isBidPlacing } =
+    trpc.placeBid.useMutation({
+      onSuccess: () => {
+        form.reset();
+        setIsOpen(false);
+      },
+      onError: (err) => {
+        setServerError("Something went wrong, please try again.");
+      },
+    });
+
   const bidSchema = z.object({
     lotId: z.string().min(1, "A lot id is required."),
-    visitorId: z.string().min(1, "A visitor id is required"),
     bidAmount: z
       .number({ invalid_type_error: "Your bid must be a number" })
       .min(minBid, "Your bid is too small.")
-      .max(minBid + 1000, "Your bid is too high."),
+      .max(minBid + MAX_NEXT_BID_DELTA, "Your bid is too high."),
   });
 
   type TBidSchema = z.infer<typeof bidSchema>;
@@ -48,12 +58,11 @@ const BiddingForm = ({
   useEffect(() => {
     form.setValue("lotId", lotId);
     form.setValue("bidAmount", minBid);
-    form.setValue("visitorId", visitorId);
-  }, [lotId, minBid, visitorId, form]);
+  }, [lotId, minBid, form]);
 
-  const onSubmit = (data: TBidSchema) => {
+  const onSubmit = async (data: TBidSchema) => {
     setServerError("");
-    console.log(data);
+    placeBid(data);
   };
 
   return (
@@ -127,7 +136,7 @@ const BiddingForm = ({
               aria-label="proceed to placing the bid"
             >
               <div className="text-[18px]">
-                {false ? (
+                {isBidPlacing ? (
                   <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                 ) : (
                   "Place your Bid!"

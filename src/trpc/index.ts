@@ -20,7 +20,9 @@ import {
 import { absoluteUrl, deleteImagesFromS3 } from "@/lib/utils";
 import {
   INFINITE_QUERY_LIMIT,
+  MAX_NEXT_BID_DELTA,
   MAX_NUM_LOTS_PER_AUCTION,
+  MIN_NEXT_BID_DELTA,
 } from "@/config/constants";
 import { revalidatePath } from "next/cache";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
@@ -459,6 +461,85 @@ export const appRouter = router({
       // delete images from s3
       await deleteImagesFromS3(lot.LotImage);
       return lot;
+    }),
+
+  placeBid: privateUserProcedure
+    .input(
+      z.object({
+        lotId: z.string().min(1, "A lot id is required."),
+        bidAmount: z.number({
+          invalid_type_error: "Your bid must be a number",
+        }),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { lotId, bidAmount } = input;
+
+      // Get the lot
+      const lot = await db.lot.findFirst({
+        where: {
+          id: lotId,
+        },
+        select: {
+          id: true,
+          minBid: true,
+          topBidId: true,
+          Auction: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      });
+
+      // Make sure the lot exists
+      if (!lot) throw new TRPCError({ code: "NOT_FOUND" });
+
+      // Check that the visitor is not the owner of the lot
+      if (lot.Auction?.userId === ctx.userId)
+        throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      // Check that the visitor is not the last bidder of the lot
+      let topBid;
+      if (lot.topBidId) {
+        topBid = await db.bid.findFirst({
+          where: {
+            id: lot.topBidId,
+          },
+        });
+        if (topBid?.userId === ctx.userId)
+          throw new TRPCError({ code: "UNAUTHORIZED" });
+
+        if (topBid && bidAmount < topBid.amount + MIN_NEXT_BID_DELTA)
+          throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      // Check that the bid is not too small
+      if (bidAmount < lot.minBid) throw new TRPCError({ code: "BAD_REQUEST" });
+
+      // Check that the bid is not too big
+      if (bidAmount > lot.minBid + MAX_NEXT_BID_DELTA)
+        throw new TRPCError({ code: "BAD_REQUEST" });
+
+      // Create the bid
+      const newBid = await db.bid.create({
+        data: {
+          amount: bidAmount,
+          lotId: lotId,
+          userId: ctx.userId,
+        },
+      });
+
+      // Update the lot
+      await db.lot.update({
+        where: {
+          id: lotId,
+        },
+        data: {
+          minBid: bidAmount + MIN_NEXT_BID_DELTA,
+          topBidId: newBid.id,
+        },
+      });
     }),
 
   createStripeSession: privateUserProcedure.mutation(async ({ ctx }) => {

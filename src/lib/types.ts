@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CATEGORIES } from "../config/constants";
+import { CATEGORIES, MAX_NEXT_BID_DELTA } from "../config/constants";
 
 export const createAuctionSchema = z
   .object({
@@ -71,7 +71,7 @@ export const createLotSchema = z.object({
   minBid: z
     .number({ invalid_type_error: "Your bid must be a number." })
     .min(1, "Your bid is too small.")
-    .max(1000, "Your minimal bid is too high."),
+    .max(MAX_NEXT_BID_DELTA, "Your minimal bid is too high."),
 });
 
 export type TCreateLotSchema = z.infer<typeof createLotSchema>;
@@ -91,7 +91,7 @@ export const updateLotSchema = z.object({
   minBid: z
     .number({ invalid_type_error: "Your bid must be a number" })
     .min(1, "Your bid is too small.")
-    .max(1000, "Your minimal bid is too high."),
+    .max(MAX_NEXT_BID_DELTA, "Your minimal bid is too high."),
 });
 
 export type TUpdateLotSchema = z.infer<typeof updateLotSchema>;

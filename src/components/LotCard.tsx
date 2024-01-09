@@ -91,6 +91,7 @@ const LotCard = ({ lot, disableBid, visitorId }: LotCardProps) => {
             minBid={lot.minBid}
             imgUrl={lot.mainImgUrl ? lot.mainImgUrl : "/standard-lot.jpg"}
             visitorId={visitorId}
+            setIsOpen={setIsOpen}
           />
         )}
       </DialogContent>

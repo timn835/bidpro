@@ -16,24 +16,12 @@ const Page = async ({ params }: PageProps) => {
   // make sure you have a user
   const { getUser } = getKindeServerSession();
   const user = await getUser();
-  const lot = await db.lot.findFirst({
-    where: { id: lotId },
-    select: {
-      Auction: {
-        select: {
-          userId: true,
-        },
-      },
-    },
-  });
 
-  if (!lot) return notFound();
-  let lotOwnerId;
-  if (user && user.id && lot.Auction?.userId === user.id) lotOwnerId = user.id;
+  const visitorId = user ? user.id : "";
 
   return (
     <div>
-      <LotPage lotId={lotId} lotOwnerId={lotOwnerId} />
+      <LotPage lotId={lotId} visitorId={visitorId} />
     </div>
   );
 };

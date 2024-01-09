@@ -30,9 +30,14 @@ const BiddingForm = ({
   setIsOpen,
 }: BiddingFormProps) => {
   const [serverError, setServerError] = useState<string>("");
+  const utils = trpc.useUtils();
+
   const { mutate: placeBid, isLoading: isBidPlacing } =
     trpc.placeBid.useMutation({
       onSuccess: () => {
+        utils.getPublicAuctionLots.invalidate();
+        utils.getAuctionLots.invalidate();
+        utils.getLot.invalidate();
         form.reset();
         setIsOpen(false);
       },

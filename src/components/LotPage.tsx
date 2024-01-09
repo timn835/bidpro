@@ -2,6 +2,7 @@
 
 import { trpc } from "@/app/_trpc/client";
 import { Button } from "./ui/button";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import Skeleton from "react-loading-skeleton";
 import { notFound } from "next/navigation";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
@@ -12,13 +13,15 @@ import AddImagesButton from "./action_buttons/AddImagesButton";
 import { MAX_NUM_IMGS } from "@/config/constants";
 import DeleteLotButton from "./action_buttons/DeleteLotButton";
 import { useState } from "react";
+import { CheckCircle } from "lucide-react";
+import BidButton from "./action_buttons/BidButton";
 
 type LotPageProps = {
   lotId: string;
-  lotOwnerId?: string;
+  visitorId: string;
 };
 
-const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
+const LotPage = ({ lotId, visitorId }: LotPageProps) => {
   // the state will keep track of the image slider
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -75,7 +78,7 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
           </div>
         </div>
         <div className="p-2 rounded-md gap-2 bg-white flex flex-wrap justify-around">
-          {lotOwnerId ? (
+          {visitorId === lot.Auction?.userId ? (
             <>
               <UpdateLotButton lot={lot} refetch={refetch} />
               <AddImagesButton
@@ -95,8 +98,37 @@ const LotPage = ({ lotId, lotOwnerId }: LotPageProps) => {
               />
               <DeleteLotButton lotId={lot.id} auctionId={lot.Auction!.id} />
             </>
+          ) : visitorId === lot.topBidderId ? (
+            <Button
+              size="lg"
+              className="w-32 bg-green-500 hover:bg-green-500 hover:cursor-default"
+            >
+              <CheckCircle />
+            </Button>
+          ) : visitorId === "" ? (
+            <div>
+              <LoginLink
+                className="w-full text-center"
+                postLoginRedirectURL={`/lots/${lot.id}`}
+              >
+                <Button
+                  size="lg"
+                  className="w-32"
+                  aria-label="log in to bid on the lot"
+                >
+                  Log in to Bid
+                </Button>
+              </LoginLink>
+            </div>
           ) : (
-            <Button className="w-32">Bid</Button>
+            <BidButton
+              lotId={lot.id}
+              lotTitle={lot.title}
+              lotNumber={lot.lotNumber}
+              minBid={lot.minBid}
+              numOfBids={lot._count.Bid}
+              imgUrl={lot.mainImgUrl ? lot.mainImgUrl : "/standard-lot.jpg"}
+            />
           )}
         </div>
         <div className="w-full p-2 rounded-md gap-2 bg-white divide-y-2">

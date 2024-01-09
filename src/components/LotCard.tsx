@@ -1,4 +1,5 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
+import { LoginLink } from "@kinde-oss/kinde-auth-nextjs/components";
 import { Card, CardContent, CardFooter, CardTitle } from "./ui/card";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -6,6 +7,7 @@ import { USDollar, calcRemainingTime } from "@/lib/utils";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import BiddingForm from "./BiddingForm";
+import { CheckCircle } from "lucide-react";
 
 type LotCardProps = {
   lot: {
@@ -14,6 +16,7 @@ type LotCardProps = {
     description: string;
     category: string;
     minBid: number;
+    topBidderId: string | null;
     lotNumber: number;
     mainImgUrl: string | null;
     _count: { Bid: number };
@@ -23,9 +26,10 @@ type LotCardProps = {
   };
   disableBid: boolean;
   visitorId: string;
+  pathname: string;
 };
 
-const LotCard = ({ lot, disableBid, visitorId }: LotCardProps) => {
+const LotCard = ({ lot, disableBid, visitorId, pathname }: LotCardProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const formattedMinBid = USDollar.format(lot.minBid);
   return (
@@ -72,11 +76,26 @@ const LotCard = ({ lot, disableBid, visitorId }: LotCardProps) => {
           </p>
         </CardContent>
         <CardFooter className="bg-gray-50 dark:bg-zinc-900">
-          <DialogTrigger asChild onClick={() => setIsOpen(true)}>
-            <Button size="lg" className="w-full" disabled={disableBid}>
-              Bid {formattedMinBid}
+          {lot.topBidderId !== null && visitorId === lot.topBidderId ? (
+            <Button
+              size="lg"
+              className="w-full bg-green-500 hover:bg-green-500 hover:cursor-default"
+            >
+              <CheckCircle />
             </Button>
-          </DialogTrigger>
+          ) : visitorId === "" ? (
+            <LoginLink postLoginRedirectURL={pathname} className="w-full">
+              <Button size="lg" className="w-full">
+                Bid {formattedMinBid}
+              </Button>
+            </LoginLink>
+          ) : (
+            <DialogTrigger asChild onClick={() => setIsOpen(true)}>
+              <Button size="lg" className="w-full" disabled={disableBid}>
+                Bid {formattedMinBid}
+              </Button>
+            </DialogTrigger>
+          )}
         </CardFooter>
       </Card>
       <DialogContent>
@@ -90,7 +109,6 @@ const LotCard = ({ lot, disableBid, visitorId }: LotCardProps) => {
             numOfBids={lot._count.Bid}
             minBid={lot.minBid}
             imgUrl={lot.mainImgUrl ? lot.mainImgUrl : "/standard-lot.jpg"}
-            visitorId={visitorId}
             setIsOpen={setIsOpen}
           />
         )}

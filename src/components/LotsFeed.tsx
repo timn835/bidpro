@@ -36,6 +36,7 @@ const LotsFeed = ({
   disableBids = false,
 }: LotsFeedProps) => {
   const searchParams = useSearchParams();
+
   const router = useRouter();
 
   let pageNumber = 1;
@@ -47,6 +48,8 @@ const LotsFeed = ({
   if (quantity && !isNaN(Number(quantity))) lotsPerPage = Number(quantity);
 
   let totalPages = Math.ceil(numOfLots / lotsPerPage);
+
+  const pathname = `/auctions/${auctionId}?page=${pageNumber}&quantity=${lotsPerPage}`;
 
   const {
     data: lots,
@@ -103,68 +106,68 @@ const LotsFeed = ({
         <Pagination>
           <PaginationContent>
             {pageNumber !== 1 ? (
-              <PaginationItem>
-                <PaginationPrevious
-                  href={`/auctions/${auctionId}/?page=${
-                    pageNumber - 1
-                  }&quantity=${lotsPerPage}`}
-                />
-              </PaginationItem>
-            ) : null}
+              // <PaginationItem>
+              <PaginationPrevious
+                href={`/auctions/${auctionId}/?page=${
+                  pageNumber - 1
+                }&quantity=${lotsPerPage}`}
+              />
+            ) : // </PaginationItem>
+            null}
             {pageNumber - 1 > 1 ? (
-              <PaginationItem>
-                <PaginationLink
-                  href={`/auctions/${auctionId}/?page=1&quantity=${lotsPerPage}`}
-                >
-                  <PaginationEllipsis />
-                </PaginationLink>
-              </PaginationItem>
-            ) : null}
-            {pageNumber > 1 ? (
-              <PaginationItem>
-                <PaginationLink
-                  href={`/auctions/${auctionId}/?page=${
-                    pageNumber - 1
-                  }&quantity=${lotsPerPage}`}
-                >
-                  {pageNumber - 1}
-                </PaginationLink>
-              </PaginationItem>
-            ) : null}
-            <PaginationItem>
-              <PaginationLink href="#" isActive>
-                {pageNumber}
+              // <PaginationItem>
+              <PaginationLink
+                href={`/auctions/${auctionId}/?page=1&quantity=${lotsPerPage}`}
+              >
+                <PaginationEllipsis />
               </PaginationLink>
-            </PaginationItem>
+            ) : // </PaginationItem>
+            null}
+            {pageNumber > 1 ? (
+              // <PaginationItem>
+              <PaginationLink
+                href={`/auctions/${auctionId}/?page=${
+                  pageNumber - 1
+                }&quantity=${lotsPerPage}`}
+              >
+                {pageNumber - 1}
+              </PaginationLink>
+            ) : // </PaginationItem>
+            null}
+            {/* <PaginationItem> */}
+            <PaginationLink href="#" isActive>
+              {pageNumber}
+            </PaginationLink>
+            {/* </PaginationItem> */}
             {pageNumber < totalPages ? (
-              <PaginationItem>
-                <PaginationLink
-                  href={`/auctions/${auctionId}/?page=${
-                    pageNumber + 1
-                  }&quantity=${lotsPerPage}`}
-                >
-                  {pageNumber + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ) : null}
+              // <PaginationItem>
+              <PaginationLink
+                href={`/auctions/${auctionId}/?page=${
+                  pageNumber + 1
+                }&quantity=${lotsPerPage}`}
+              >
+                {pageNumber + 1}
+              </PaginationLink>
+            ) : // </PaginationItem>
+            null}
             {totalPages - pageNumber > 1 ? (
-              <PaginationItem>
-                <PaginationLink
-                  href={`/auctions/${auctionId}/?page=${totalPages}&quantity=${lotsPerPage}`}
-                >
-                  <PaginationEllipsis />
-                </PaginationLink>
-              </PaginationItem>
-            ) : null}
+              // <PaginationItem>
+              <PaginationLink
+                href={`/auctions/${auctionId}/?page=${totalPages}&quantity=${lotsPerPage}`}
+              >
+                <PaginationEllipsis />
+              </PaginationLink>
+            ) : // </PaginationItem>
+            null}
             {pageNumber < totalPages ? (
-              <PaginationItem>
-                <PaginationNext
-                  href={`/auctions/${auctionId}/?page=${
-                    pageNumber + 1
-                  }&quantity=${lotsPerPage}`}
-                />
-              </PaginationItem>
-            ) : null}
+              // <PaginationItem>
+              <PaginationNext
+                href={`/auctions/${auctionId}/?page=${
+                  pageNumber + 1
+                }&quantity=${lotsPerPage}`}
+              />
+            ) : // </PaginationItem>
+            null}
           </PaginationContent>
         </Pagination>
       </div>
@@ -175,6 +178,7 @@ const LotsFeed = ({
             lot={lot}
             disableBid={disableBids}
             visitorId={visitorId}
+            pathname={pathname}
           />
         ))}
       </div>

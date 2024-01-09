@@ -60,7 +60,8 @@ model Lot {
   lotNumber Int
 
   mainImgUrl String?
-  topBidId String?
+  topBidId String? // reference to the top bid
+  topBidderId String? // reference to the top bidder user
 
   LotImage LotImage[]
   Bid Bid[]

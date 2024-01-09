@@ -240,7 +240,7 @@ export const appRouter = router({
     .input(
       z.object({
         auctionId: z.string().nullish(),
-        pageNumber: z.number().min(1).max(10).nullish(),
+        pageNumber: z.number().min(1).nullish(),
         lotsPerPage: z.number().min(5).max(20).nullish(),
       })
     )
@@ -291,6 +291,7 @@ export const appRouter = router({
           Auction: {
             select: {
               id: true,
+              userId: true,
               endsAt: true,
             },
           },
@@ -538,6 +539,7 @@ export const appRouter = router({
         data: {
           minBid: bidAmount + MIN_NEXT_BID_DELTA,
           topBidId: newBid.id,
+          topBidderId: ctx.userId,
         },
       });
     }),

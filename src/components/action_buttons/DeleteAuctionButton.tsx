@@ -62,7 +62,7 @@ function DeleteAuctionConfirm({
       onSuccess: () => {
         // utils.getUserAuctions.invalidate();
         setIsOpen(false);
-        router.push("/dashboard");
+        router.push("/dashboard/auctions");
       },
       onError: (err) => {
         console.error(err);

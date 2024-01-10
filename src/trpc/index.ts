@@ -29,6 +29,7 @@ import {
 import { revalidatePath } from "next/cache";
 import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
 import { PLANS } from "@/config/stripe";
+import { Bid } from "@prisma/client";
 
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
@@ -51,6 +52,8 @@ export const appRouter = router({
         data: {
           id: user.id,
           email: user.email,
+          firstName: user.given_name ? user.given_name : "John",
+          lastName: user.family_name ? user.family_name : "Doe",
         },
       });
     }
@@ -572,10 +575,61 @@ export const appRouter = router({
           topBidderId: ctx.userId,
         },
       });
-
-      // Revalidate the path
-      revalidatePath("/dashboard/bids");
     }),
+
+  getBids: privateUserProcedure.query(async ({ ctx }) => {
+    const { userId } = ctx;
+    const bids = await db.bid.findMany({
+      where: {
+        userId,
+      },
+      include: {
+        Lot: {
+          select: {
+            id: true,
+            title: true,
+            lotNumber: true,
+            description: true,
+            minBid: true,
+            topBidId: true,
+            topBidderId: true,
+            Auction: {
+              select: {
+                title: true,
+                endsAt: true,
+              },
+            },
+          },
+        },
+      },
+      take: 50,
+    });
+
+    // the bids where the user is leading
+    const leadingBids = bids.filter((bid) => bid.id === bid.Lot?.topBidId);
+
+    // the bids where the user is not leading, max 1 bid per lot
+    const trailingBids = bids
+      .sort((a, b) => {
+        if (a.lotId === b.lotId) return b.amount - a.amount;
+        return 1;
+      })
+      .filter((bid, i) => {
+        if (userId === bid.Lot?.topBidderId) return false;
+        if (i + 1 < bids.length && bid.lotId === bids[i + 1].lotId)
+          return false;
+        return true;
+      });
+
+    const getLeaderPromises = trailingBids.map((bid) => {
+      if (typeof bid.Lot?.topBidderId !== "string") return;
+      return db.user.findFirst({ where: { id: bid.Lot!.topBidderId } });
+    });
+
+    const leaders = await Promise.all(getLeaderPromises);
+    const leaderNames = leaders.map((leader) => leader?.firstName ?? "");
+    return { leadingBids, trailingBids, leaderNames };
+  }),
 
   createStripeSession: privateUserProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;

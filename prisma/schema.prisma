@@ -14,6 +14,8 @@ generator client {
 model User {
   id String @id @unique //comes from kinde auth
   email String @unique
+  firstName String
+  lastName String
   role Role @default(USER)
 
   Auction Auction[]

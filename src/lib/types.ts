@@ -18,7 +18,7 @@ export const createAuctionSchema = z
       required_error: "An end date is required.",
     }),
   })
-  .refine((data) => data.startDate >= new Date(), {
+  .refine((data) => data.startDate >= new Date(new Date().toDateString()), {
     message: "The start date must be in the future.",
     path: ["startDate"],
   })

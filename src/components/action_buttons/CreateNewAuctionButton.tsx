@@ -157,7 +157,9 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date < new Date()}
+                        disabled={(date) =>
+                          date < new Date(new Date().toDateString())
+                        }
                         initialFocus
                       />
                     </PopoverContent>
@@ -204,7 +206,7 @@ function CreateAuctionForm({ setIsOpen }: CreateAuctionFormProps) {
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date() ||
+                          date < new Date(new Date().toDateString()) ||
                           (form.getValues("startDate") &&
                             form.getValues("startDate") > date)
                         }

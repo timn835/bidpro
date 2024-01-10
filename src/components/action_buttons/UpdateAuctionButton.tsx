@@ -75,7 +75,7 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
         utils.getUserAuctions.invalidate();
         form.reset();
         setIsOpen(false);
-        router.push(`/dashboard`);
+        router.push(`/dashboard/auctions`);
       },
       onError: (err) => {
         setServerError("Something went wrong, please try again.");
@@ -175,7 +175,9 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
                         mode="single"
                         selected={field.value}
                         onSelect={field.onChange}
-                        disabled={(date) => date < new Date()}
+                        disabled={(date) =>
+                          date < new Date(new Date().toDateString())
+                        }
                         initialFocus
                       />
                     </PopoverContent>
@@ -223,7 +225,7 @@ function UpdateAuctionForm({ auction, setIsOpen }: UpdateAuctionFormProps) {
                         selected={field.value}
                         onSelect={field.onChange}
                         disabled={(date) =>
-                          date < new Date() ||
+                          date < new Date(new Date().toDateString()) ||
                           (form.getValues("startDate") &&
                             form.getValues("startDate") > date)
                         }

@@ -5,9 +5,7 @@ import { Image } from "./types";
 import { TRPCError } from "@trpc/server";
 import { db } from "@/db";
 import { type Metadata } from "next";
-
-// difference between lots ending in seconds
-const LOT_TIME_DELTA = 30;
+import { LOT_TIME_DELTA } from "@/config/constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

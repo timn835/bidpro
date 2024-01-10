@@ -19,7 +19,9 @@ import {
 } from "@/lib/types";
 import { absoluteUrl, deleteImagesFromS3 } from "@/lib/utils";
 import {
+  CATEGORIES,
   INFINITE_QUERY_LIMIT,
+  LOT_TIME_DELTA,
   MAX_NEXT_BID_DELTA,
   MAX_NUM_LOTS_PER_AUCTION,
   MIN_NEXT_BID_DELTA,
@@ -343,6 +345,22 @@ export const appRouter = router({
           lotNumber: auction._count.Lot + 1,
         },
       });
+
+      /* Script to create filler lots after the first 10 lots
+      const promises = Array.apply(null, Array(90)).map((_, i) =>
+        db.lot.create({
+          data: {
+            lotNumber: 11 + i,
+            title: "Filler Item",
+            category: CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)],
+            auctionId: input.auctionId,
+            minBid: Math.floor(Math.random() * 10000) / 100,
+            description:
+              "Phasellus et dolor ac augue elementum scelerisque semper rhoncus lacus. Donec euismod dui id eros elementum mattis. Nullam consectetur, felis ut cursus commodo, ante arcu efficitur magna, sed malesuada nibh metus vel nisl.",
+          },
+        })
+      );
+      await Promise.all(promises); */
       return newLot;
     }),
 
@@ -485,9 +503,11 @@ export const appRouter = router({
           id: true,
           minBid: true,
           topBidId: true,
+          lotNumber: true,
           Auction: {
             select: {
               userId: true,
+              endsAt: true,
             },
           },
         },
@@ -499,6 +519,16 @@ export const appRouter = router({
       // Check that the visitor is not the owner of the lot
       if (lot.Auction?.userId === ctx.userId)
         throw new TRPCError({ code: "UNAUTHORIZED" });
+
+      // Check that the lot has not expired
+      if (lot.Auction) {
+        if (
+          lot.Auction.endsAt.getTime() * 1000 + lot.lotNumber * LOT_TIME_DELTA <
+          new Date().getTime() * 1000
+        ) {
+          throw new TRPCError({ code: "BAD_REQUEST" });
+        }
+      }
 
       // Check that the visitor is not the last bidder of the lot
       let topBid;
@@ -542,6 +572,9 @@ export const appRouter = router({
           topBidderId: ctx.userId,
         },
       });
+
+      // Revalidate the path
+      revalidatePath("/dashboard/bids");
     }),
 
   createStripeSession: privateUserProcedure.mutation(async ({ ctx }) => {

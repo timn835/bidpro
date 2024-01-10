@@ -23,7 +23,7 @@ const UploadDropzone = ({ auctionId }: UploadImageButtonProps) => {
   const { toast } = useToast();
   const { mutate: startPolling } = trpc.getImage.useMutation({
     onSuccess: () => {
-      router.push("/dashboard");
+      router.push("/dashboard/auctions");
     },
     retry: true,
     retryDelay: 500,

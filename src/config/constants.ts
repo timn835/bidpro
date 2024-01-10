@@ -11,6 +11,9 @@ export const CATEGORIES = [
   "Fine Wines and Spirits",
 ] as const;
 
+// difference between lots ending in seconds
+export const LOT_TIME_DELTA = 30;
+
 export const MAX_NUM_IMGS = 5;
 export const MAX_NUM_LOTS_PER_AUCTION = 100;
 export const INFINITE_QUERY_LIMIT = 10;

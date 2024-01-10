@@ -3,7 +3,7 @@
 import { trpc } from "@/app/_trpc/client";
 import Skeleton from "react-loading-skeleton";
 import Link from "next/link";
-import { GavelIcon, Layers3, Loader2, Plus, Trash } from "lucide-react";
+import { GavelIcon, Ghost, Layers3, Loader2, Plus, Trash } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "../ui/button";
 import { useState } from "react";
@@ -142,6 +142,7 @@ const AuctionsDashboard = () => {
         <Skeleton height={100} className="my-2" count={3} />
       ) : (
         <div className="mt-16 flex flex-col items-center gap-2">
+          <Ghost className="h-8 w-8 text-zinc-800" />
           <h3 className="font-semibold text-xl">
             You are not holding any auctions at the moment.
           </h3>

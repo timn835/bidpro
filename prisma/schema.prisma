@@ -89,6 +89,9 @@ model Bid {
   id String @id @default(cuid())
   amount Float
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   lotId String?
   Lot Lot? @relation(fields: [lotId], references: [id])
   @@index([lotId])

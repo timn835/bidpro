@@ -67,7 +67,7 @@ const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
   }, [inView, fetchNextPage, hasNextPage]);
 
   return (
-    <div className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
+    <main className="flex-1 justify-between flex flex-col h-[calc(100vh-3.5rem)]">
       <div className="mx-auto w-full grow lg:flex xl:px-2">
         {/* left side */}
         <div className="flex-1 xl:flex">
@@ -225,7 +225,7 @@ const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
 
         {/* end of right side */}
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -631,6 +631,52 @@ export const appRouter = router({
     return { leadingBids, trailingBids, leaderNames };
   }),
 
+  getLotsWithBids: privateAdminProcedure
+    .input(z.object({ auctionId: z.string() }))
+    .query(async ({ input }) => {
+      const { auctionId } = input;
+      // we have already checked in the component that the auction belongs to the admin user
+
+      return await db.lot.findMany({
+        where: {
+          auctionId,
+          topBidderId: { not: null },
+          topBidId: { not: null },
+        },
+        select: {
+          id: true,
+          title: true,
+          lotNumber: true,
+          mainImgUrl: true,
+          _count: {
+            select: {
+              Bid: true,
+            },
+          },
+          Bid: {
+            select: {
+              id: true,
+              amount: true,
+              User: {
+                select: {
+                  email: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+            take: 5,
+            orderBy: {
+              amount: "desc",
+            },
+          },
+        },
+        orderBy: {
+          lotNumber: "asc",
+        },
+      });
+    }),
+
   createStripeSession: privateUserProcedure.mutation(async ({ ctx }) => {
     const { userId } = ctx;
 

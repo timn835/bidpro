@@ -10,7 +10,7 @@ import {
 import { format } from "date-fns";
 import { USDollar, calcRemainingTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, HelpCircle, XCircle } from "lucide-react";
+import { CheckCircle, HelpCircle, InfoIcon, XCircle } from "lucide-react";
 import Link from "next/link";
 import { trpc } from "@/app/_trpc/client";
 import Skeleton from "react-loading-skeleton";
@@ -114,7 +114,7 @@ const UserBidsFeed = () => {
           Your trailing bids
           <Tooltip delayDuration={300}>
             <TooltipTrigger className="cursor-default ml-1.5">
-              <HelpCircle className="h-4 w-4 text-zinc-500" />
+              <InfoIcon className="h-7 w-7 text-zinc-500" />
             </TooltipTrigger>
             <TooltipContent className="w-80 p-2">
               Only your largest trailing bid for the lot is shown.

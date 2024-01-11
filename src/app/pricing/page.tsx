@@ -13,7 +13,7 @@ import {
   LoginLink,
   getKindeServerSession,
 } from "@kinde-oss/kinde-auth-nextjs/server";
-import { ArrowRight, Check, HelpCircle, Minus } from "lucide-react";
+import { ArrowRight, Check, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 const Page = async () => {

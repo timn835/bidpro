@@ -34,7 +34,6 @@ const LotsFeed = ({
   disableBids = false,
 }: LotsFeedProps) => {
   const searchParams = useSearchParams();
-
   const router = useRouter();
 
   let pageNumber = 1;
@@ -85,13 +84,13 @@ const LotsFeed = ({
   const { lots, numOfLots } = data;
   const totalPages = Math.ceil(numOfLots / lotsPerPage);
 
-  if (lots && lots.length === 0) return;
-  <div className="mt-16 flex flex-col items-center gap-2">
-    <h3 className="font-semibold text-xl">
-      The auctioneer has yet to upload any lots.
-    </h3>
-    <p>Please come back soon!</p>
-  </div>;
+  if (lots && lots.length === 0)
+    return (
+      <div className="mt-16 flex flex-col items-center gap-2">
+        <h3 className="font-semibold text-xl">No lots to display, sorry.</h3>
+        <p>Please come back soon!</p>
+      </div>
+    );
 
   return (
     <div className="space-y-6 p-6">

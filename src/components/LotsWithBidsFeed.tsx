@@ -12,12 +12,6 @@ import Image from "next/image";
 import { CheckCircle, InfoIcon, XCircle } from "lucide-react";
 import { USDollar, cn } from "@/lib/utils";
 import { Table, TableBody, TableCell, TableRow } from "./ui/table";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
 
 type LotsWithBidsFeedProps = {
   auctionId: string;
@@ -67,25 +61,9 @@ const LotsWithBidsFeed = ({ auctionId }: LotsWithBidsFeedProps) => {
               <div>
                 Lot #{lot.lotNumber}: {lot.title}
               </div>
-              {lot._count.Bid > 5 ? (
-                <TooltipProvider>
-                  <div className="hidden md:block">
-                    Total number of bids: {lot._count.Bid}
-                    <Tooltip delayDuration={300}>
-                      <TooltipTrigger className="cursor-default ml-1.5">
-                        <InfoIcon className="h-6 w-6 text-zinc-500" />
-                      </TooltipTrigger>
-                      <TooltipContent className="w-80 p-2">
-                        Only the top 5 bids are shown
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TooltipProvider>
-              ) : (
-                <div className="hidden md:block">
-                  Total number of bids: {lot._count.Bid}
-                </div>
-              )}
+              <div className="hidden md:block">
+                Total number of bids: {lot._count.Bid}
+              </div>
             </AccordionTrigger>
             <AccordionContent className="text-center">
               <Table>

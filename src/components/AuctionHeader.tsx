@@ -16,7 +16,7 @@ type AuctionHeaderProps = {
 const AuctionHeader = ({ auction }: AuctionHeaderProps) => {
   return (
     <div className="text-zinc-600 rounded-xl bg-white shadow-lg mx-6 mt-6 text-center flex flex-col sm:flex-row items-center justify-around">
-      <div className="relative h-96 w-96 my-6">
+      <div className="relative h-72 w-72 sm:h-96 sm:w-96 my-6">
         <Image
           src={auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"}
           alt="auction-image"

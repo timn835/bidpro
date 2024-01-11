@@ -75,7 +75,7 @@ const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
             <div className="flex flex-col md:flex-row justify-around bg-white rounded-md flex-wrap">
               <div className="flex flex-col items-center mb-4">
                 <h1 className="font-bold text-xl p-5">{auction.title}</h1>
-                <div className="relative h-80 w-80 md:h-96 md:w-96">
+                <div className="relative h-72 w-72 md:h-96 md:w-96">
                   <Image
                     src={
                       auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"
@@ -133,7 +133,7 @@ const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
           <div className="flex flex-col bg-white rounded-md">
             <div>
               <div className="w-full flex flex-wrap justify-between p-4 gap-x-4 border-b-2">
-                <h1 className="font-bold text-xl">Lots registered</h1>
+                <h1 className="font-bold text-xl mb-2">Lots registered</h1>
                 <CreateLotButton
                   auctionId={auction.id}
                   disabled={auction.startsAt.getTime() < new Date().getTime()}

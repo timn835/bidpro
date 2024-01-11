@@ -216,10 +216,10 @@ function CreateLotForm({ auctionId, setIsOpen }: CreateLotFormProps) {
             </label>
             <Textarea
               {...form.register("description")}
-              rows={1}
+              rows={7}
               id="description"
               placeholder="Describe your product"
-              maxRows={4}
+              maxRows={7}
               className="resize-none"
             />
             {form.formState.errors.description && (

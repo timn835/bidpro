@@ -52,8 +52,8 @@ export const appRouter = router({
         data: {
           id: user.id,
           email: user.email,
-          firstName: user.given_name ? user.given_name : "John",
-          lastName: user.family_name ? user.family_name : "Doe",
+          firstName: user.given_name ? user.given_name : "Unknown",
+          lastName: user.family_name ? user.family_name : "Unknown",
         },
       });
     }
@@ -349,8 +349,8 @@ export const appRouter = router({
       });
       if (!auction) throw new TRPCError({ code: "NOT_FOUND" });
 
-      // make sure the auction has not yet started
-      if (auction.startsAt.getTime() < new Date().getTime())
+      // make sure the auction has not yet ended
+      if (auction.endsAt.getTime() < new Date().getTime())
         throw new TRPCError({ code: "BAD_REQUEST" });
 
       // make sure that there are no more than 100 lots

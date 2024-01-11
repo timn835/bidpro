@@ -20,6 +20,7 @@ const fetchActiveAuctions = async () => {
       User: {
         select: {
           email: true,
+          firstName: true,
         },
       },
     },
@@ -104,7 +105,7 @@ const AuctionsFeed = async () => {
             </div>
             <div className="flex items-center gap-2">
               <UserCheck className="h-4 w-4" />
-              {auction.User?.email.split("@")[0]}
+              {auction.User?.firstName}
             </div>
           </div>
         </li>

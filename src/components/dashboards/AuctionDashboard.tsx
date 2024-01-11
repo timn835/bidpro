@@ -136,7 +136,7 @@ const AuctionDashboard = ({ auction, numOfLots }: AuctionDashboardProps) => {
                 <h1 className="font-bold text-xl mb-2">Lots registered</h1>
                 <CreateLotButton
                   auctionId={auction.id}
-                  disabled={auction.startsAt.getTime() < new Date().getTime()}
+                  disabled={auction.endsAt.getTime() < new Date().getTime()}
                 />
               </div>
               <div className="max-h-[70vh] overflow-auto">

@@ -8,7 +8,6 @@ import {
   Pagination,
   PaginationContent,
   PaginationEllipsis,
-  PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
@@ -21,18 +20,17 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Label } from "./ui/label";
+import { CATEGORIES } from "@/config/constants";
 
 type LotsFeedProps = {
   auctionId: string;
   visitorId: string;
-  numOfLots: number;
   disableBids: boolean;
 };
 
 const LotsFeed = ({
   visitorId,
   auctionId,
-  numOfLots,
   disableBids = false,
 }: LotsFeedProps) => {
   const searchParams = useSearchParams();
@@ -47,18 +45,28 @@ const LotsFeed = ({
   const quantity = searchParams.get("quantity");
   if (quantity && !isNaN(Number(quantity))) lotsPerPage = Number(quantity);
 
-  let totalPages = Math.ceil(numOfLots / lotsPerPage);
+  let catIdx: number | undefined;
+  let category = searchParams.get("category");
+  if (category && !isNaN(Number(category))) {
+    let categoryAsNum = Number(category);
+    if (categoryAsNum >= 0 && categoryAsNum < CATEGORIES.length) {
+      catIdx = categoryAsNum;
+    }
+  }
 
-  const pathname = `/auctions/${auctionId}?page=${pageNumber}&quantity=${lotsPerPage}`;
+  const pathname = `/auctions/${auctionId}?page=${pageNumber}&quantity=${lotsPerPage}${
+    catIdx !== undefined ? `&category=${catIdx}` : ""
+  }`;
 
   const {
-    data: lots,
+    data,
     isLoading: areLotsLoading,
     isError,
   } = trpc.getPublicAuctionLots.useQuery({
     auctionId,
     lotsPerPage,
     pageNumber,
+    catIdx,
   });
 
   if (areLotsLoading)
@@ -74,6 +82,9 @@ const LotsFeed = ({
       </div>
     );
 
+  const { lots, numOfLots } = data;
+  const totalPages = Math.ceil(numOfLots / lotsPerPage);
+
   if (lots && lots.length === 0) return;
   <div className="mt-16 flex flex-col items-center gap-2">
     <h3 className="font-semibold text-xl">
@@ -84,90 +95,127 @@ const LotsFeed = ({
 
   return (
     <div className="space-y-6 p-6">
-      <div className="w-full flex flex-col md:flex-row items-center md:justify-end gap-3">
-        <Label htmlFor="quantity">Lots per page</Label>
-        <Select
-          onValueChange={(e) => {
-            if (lotsPerPage === Number(e)) return;
-            router.push(`/auctions/${auctionId}?page=1&quantity=${e}`);
-          }}
-          defaultValue={`${lotsPerPage}`}
-        >
-          <SelectTrigger className="w-[280px]">
-            <SelectValue placeholder="Lots per page" />
-          </SelectTrigger>
-          <SelectContent id="quantity">
-            <SelectItem value="5">5</SelectItem>
-            <SelectItem value="10">10</SelectItem>
-            <SelectItem value="15">15</SelectItem>
-            <SelectItem value="20">20</SelectItem>
-          </SelectContent>
-        </Select>
+      <div className="w-full flex flex-col lg:flex-row items-center gap-3">
+        <div className="flex items-center gap-1">
+          <Label htmlFor="quantity">Lots per page</Label>
+          <Select
+            onValueChange={(e) => {
+              if (lotsPerPage === Number(e)) return;
+              router.push(
+                `/auctions/${auctionId}?page=1&quantity=${e}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`
+              );
+            }}
+            defaultValue={`${lotsPerPage}`}
+          >
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="Lots per page" />
+            </SelectTrigger>
+            <SelectContent id="quantity">
+              <SelectItem value="5">5</SelectItem>
+              <SelectItem value="10">10</SelectItem>
+              <SelectItem value="15">15</SelectItem>
+              <SelectItem value="20">20</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-1">
+          <Label htmlFor="quantity">Category</Label>
+          <Select
+            onValueChange={(e) => {
+              if (e === "all-categories")
+                router.push(
+                  `/auctions/${auctionId}?page=1&quantity=${lotsPerPage}`
+                );
+              const newCatIdx = CATEGORIES.findIndex((cat) => cat === e);
+              if (newCatIdx === -1 || newCatIdx === catIdx) return;
+              router.push(
+                `/auctions/${auctionId}?page=1&quantity=${lotsPerPage}&category=${newCatIdx}`
+              );
+            }}
+            defaultValue={catIdx !== undefined ? CATEGORIES[catIdx] : undefined}
+          >
+            <SelectTrigger className="w-[280px]">
+              <SelectValue placeholder="Filter by category" />
+            </SelectTrigger>
+            <SelectContent id="category">
+              {catIdx ? (
+                <SelectItem key="all-categories" value="all-categories">
+                  Select All
+                </SelectItem>
+              ) : null}
+              {CATEGORIES.map((category) => (
+                <SelectItem key={category} value={category}>
+                  {category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <Pagination>
           <PaginationContent>
             {pageNumber !== 1 ? (
-              // <PaginationItem>
               <PaginationPrevious
                 href={`/auctions/${auctionId}/?page=${
                   pageNumber - 1
-                }&quantity=${lotsPerPage}`}
+                }&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               />
-            ) : // </PaginationItem>
-            null}
+            ) : null}
             {pageNumber - 1 > 1 ? (
-              // <PaginationItem>
               <PaginationLink
-                href={`/auctions/${auctionId}/?page=1&quantity=${lotsPerPage}`}
+                href={`/auctions/${auctionId}/?page=1&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               >
                 <PaginationEllipsis />
               </PaginationLink>
-            ) : // </PaginationItem>
-            null}
+            ) : null}
             {pageNumber > 1 ? (
-              // <PaginationItem>
               <PaginationLink
                 href={`/auctions/${auctionId}/?page=${
                   pageNumber - 1
-                }&quantity=${lotsPerPage}`}
+                }&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               >
                 {pageNumber - 1}
               </PaginationLink>
-            ) : // </PaginationItem>
-            null}
-            {/* <PaginationItem> */}
+            ) : null}
             <PaginationLink href="#" isActive>
               {pageNumber}
             </PaginationLink>
-            {/* </PaginationItem> */}
             {pageNumber < totalPages ? (
-              // <PaginationItem>
               <PaginationLink
                 href={`/auctions/${auctionId}/?page=${
                   pageNumber + 1
-                }&quantity=${lotsPerPage}`}
+                }&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               >
                 {pageNumber + 1}
               </PaginationLink>
-            ) : // </PaginationItem>
-            null}
+            ) : null}
             {totalPages - pageNumber > 1 ? (
-              // <PaginationItem>
               <PaginationLink
-                href={`/auctions/${auctionId}/?page=${totalPages}&quantity=${lotsPerPage}`}
+                href={`/auctions/${auctionId}/?page=${totalPages}&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               >
                 <PaginationEllipsis />
               </PaginationLink>
-            ) : // </PaginationItem>
-            null}
+            ) : null}
             {pageNumber < totalPages ? (
-              // <PaginationItem>
               <PaginationNext
                 href={`/auctions/${auctionId}/?page=${
                   pageNumber + 1
-                }&quantity=${lotsPerPage}`}
+                }&quantity=${lotsPerPage}${
+                  catIdx !== undefined ? `&category=${catIdx}` : ""
+                }`}
               />
-            ) : // </PaginationItem>
-            null}
+            ) : null}
           </PaginationContent>
         </Pagination>
       </div>

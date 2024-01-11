@@ -18,15 +18,15 @@ interface UserAccountNavProps {
   email: string | undefined;
   name: string;
   imageUrl: string;
+  isSubscribed: boolean;
 }
 
 const UserAccountNav = async ({
   email,
   imageUrl,
   name,
+  isSubscribed,
 }: UserAccountNavProps) => {
-  const subscriptionPlan = await getUserSubscriptionPlan();
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className="overflow-visible">
@@ -66,7 +66,7 @@ const UserAccountNav = async ({
         <DropdownMenuSeparator />
 
         <DropdownMenuItem asChild>
-          {subscriptionPlan?.isSubscribed ? (
+          {isSubscribed ? (
             <Link href="/dashboard/billing">Manage Subscription</Link>
           ) : (
             <Link href="/pricing">

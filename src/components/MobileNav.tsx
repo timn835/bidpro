@@ -10,7 +10,9 @@ import {
   LogoutLink,
 } from "@kinde-oss/kinde-auth-nextjs/components";
 
-const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
+type MobileNavProps = { isAuth: boolean; isSubscribed: boolean };
+
+const MobileNav = ({ isAuth, isSubscribed }: MobileNavProps) => {
   const [isOpen, setOpen] = useState<boolean>(false);
 
   const toggleOpen = () => setOpen((prev) => !prev);
@@ -81,13 +83,23 @@ const MobileNav = ({ isAuth }: { isAuth: boolean }) => {
             ) : (
               <>
                 <li>
-                  <Link
-                    onClick={() => closeOnCurrent("/pricing")}
-                    className="flex items-center w-full font-semibold"
-                    href="/pricing"
-                  >
-                    Upgrade <Gem className="text-blue-600 h-4 w-4 ml-1.5" />
-                  </Link>
+                  {isSubscribed ? (
+                    <Link
+                      onClick={() => closeOnCurrent("/dashboard/billing")}
+                      className="flex items-center w-full font-semibold"
+                      href="/dashboard/billing"
+                    >
+                      Manage Subscription
+                    </Link>
+                  ) : (
+                    <Link
+                      onClick={() => closeOnCurrent("/pricing")}
+                      className="flex items-center w-full font-semibold"
+                      href="/pricing"
+                    >
+                      Upgrade <Gem className="text-blue-600 h-4 w-4 ml-1.5" />
+                    </Link>
+                  )}
                 </li>
                 <li className="my-3 h-px w-full bg-gray-300" />
                 <li>

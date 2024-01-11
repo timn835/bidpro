@@ -51,8 +51,8 @@ const AuctionsFeed = async () => {
             className="flex flex-col gap-2"
             href={`/auctions/${auction.id}`}
           >
-            <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
-              <div className="relative h-36 w-36">
+            <div className="pt-6 px-6 flex flex-col sm:flex-row w-full items-center justify-between space-x-6">
+              <div className="relative h-36 w-36 mb-4 sm:mb-0">
                 <Image
                   src={
                     auction.imgUrl ? auction.imgUrl : "/standard-auction.jpg"

@@ -247,16 +247,33 @@ export const appRouter = router({
         auctionId: z.string().nullish(),
         pageNumber: z.number().min(1).nullish(),
         lotsPerPage: z.number().min(5).max(20).nullish(),
+        catIdx: z
+          .number()
+          .min(0)
+          .max(CATEGORIES.length - 1)
+          .nullish(),
       })
     )
     .query(async ({ input }) => {
       const { auctionId } = input;
       const pageNumber = input.pageNumber ?? 1;
       const lotsPerPage = input.lotsPerPage ?? 10;
+      const category =
+        input.catIdx !== null && input.catIdx !== undefined
+          ? CATEGORIES[input.catIdx]
+          : undefined;
+
+      const numOfLots = await db.lot.count({
+        where: {
+          auctionId,
+          category,
+        },
+      });
 
       const lots = await db.lot.findMany({
         where: {
           auctionId,
+          category,
         },
         include: {
           _count: {
@@ -273,7 +290,7 @@ export const appRouter = router({
         take: lotsPerPage,
         skip: (pageNumber - 1) * lotsPerPage,
       });
-      return lots;
+      return { lots, numOfLots };
     }),
 
   getLot: publicProcedure

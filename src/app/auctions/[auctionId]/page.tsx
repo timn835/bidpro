@@ -51,7 +51,6 @@ const Page = async ({ params }: PageProps) => {
       <LotsFeed
         auctionId={auction.id}
         visitorId={user?.id ?? ""}
-        numOfLots={auction._count.Lot}
         disableBids={user?.id === auction!.User!.id}
       />
     </main>

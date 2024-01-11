@@ -24,6 +24,7 @@ const AuctionHeader = ({ auction }: AuctionHeaderProps) => {
           style={{ objectFit: "cover" }}
           sizes={"300px"}
           className="rounded-md"
+          priority
           // placeholder="blur"
           // blurDataURL={blurImgUrl}
         />

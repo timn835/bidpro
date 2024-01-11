@@ -34,8 +34,8 @@ const AuctionDashboardLotCard = ({
       className="m-3 col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg flex flex-col justify-between"
     >
       <Link className="flex flex-col gap-2" href={`/lots/${lot.id}`}>
-        <div className="pt-6 px-6 flex w-full items-center justify-between space-x-6">
-          <div className="relative h-36 w-36">
+        <div className="pt-6 px-6 flex flex-col sm:flex-row w-full items-center justify-between space-x-6">
+          <div className="relative h-36 w-36 mb-4 sm:mb-0">
             <Image
               src={lot.mainImgUrl ? lot.mainImgUrl : "/standard-lot.jpg"}
               alt="auction-image"
@@ -53,7 +53,7 @@ const AuctionDashboardLotCard = ({
               <h3 className=" text-xl font-medium text-gray-900">
                 Lot #{lot.lotNumber}: {lot.title}
               </h3>
-              <div>
+              <div className="hidden sm:block">
                 <p>
                   <span className="font-semibold">Description: </span>
                   {lot.description}

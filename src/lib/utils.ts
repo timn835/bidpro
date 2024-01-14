@@ -90,7 +90,7 @@ export const deleteImagesFromS3 = async (images: Image[]) => {
 
 export function absoluteUrl(path: string) {
   if (typeof window !== "undefined") return path;
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${path}`;
+  if (process.env.VERCEL_URL) return `https://bidpro.vercel.app${path}`;
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
 

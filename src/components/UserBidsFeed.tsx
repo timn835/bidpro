@@ -110,10 +110,10 @@ const UserBidsFeed = () => {
       ) : null}
 
       <TooltipProvider>
-        <h1 className="mt-8 text-4xl font-bold text-gray-900 text-center">
+        <h1 className="mt-8 text-4xl font-bold text-gray-900 text-center flex justify-center">
           Your trailing bids
           <Tooltip delayDuration={300}>
-            <TooltipTrigger className="cursor-default ml-1.5">
+            <TooltipTrigger className="hidden lg:block cursor-default ml-1.5">
               <InfoIcon className="h-7 w-7 text-zinc-500" />
             </TooltipTrigger>
             <TooltipContent className="w-80 p-2">

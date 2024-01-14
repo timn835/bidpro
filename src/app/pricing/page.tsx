@@ -125,7 +125,7 @@ const Page = async () => {
                           <div className="flex items-center space-x-1">
                             <p className="text-gray-600">{text}</p>
                             <Tooltip delayDuration={300}>
-                              <TooltipTrigger className="cursor-default ml-1.5">
+                              <TooltipTrigger className="hidden lg:block cursor-default ml-1.5">
                                 <HelpCircle className="h-4 w-4 text-zinc-500" />
                               </TooltipTrigger>
                               <TooltipContent className="w-80 p-2">

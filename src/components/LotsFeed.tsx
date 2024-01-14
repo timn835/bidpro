@@ -84,11 +84,13 @@ const LotsFeed = ({
   const { lots, numOfLots } = data;
   const totalPages = Math.ceil(numOfLots / lotsPerPage);
 
-  if (lots && lots.length === 0)
+  if (!lots)
     return (
-      <div className="mt-16 flex flex-col items-center gap-2">
-        <h3 className="font-semibold text-xl">No lots to display, sorry.</h3>
-        <p>Please come back soon!</p>
+      <div className="mt-16 flex flex-col items-center gap-2 bg-red-100 text-red-400 rounded-md">
+        <h3 className="font-semibold text-xl">
+          Something went wrong while fetching the lots.
+        </h3>
+        <p>Please try again later</p>
       </div>
     );
 
@@ -218,17 +220,25 @@ const LotsFeed = ({
           </PaginationContent>
         </Pagination>
       </div>
-      <div className="grid grid-cols-1 place-items-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {lots.map((lot) => (
-          <LotCard
-            key={lot.id}
-            lot={lot}
-            disableBid={disableBids}
-            visitorId={visitorId}
-            pathname={pathname}
-          />
-        ))}
-      </div>
+
+      {lots.length > 0 ? (
+        <div className="grid grid-cols-1 place-items-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {lots.map((lot) => (
+            <LotCard
+              key={lot.id}
+              lot={lot}
+              disableBid={disableBids}
+              visitorId={visitorId}
+              pathname={pathname}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mt-16 flex flex-col items-center gap-2">
+          <h3 className="font-semibold text-xl">No lots to display, sorry.</h3>
+          <p>Please come back soon!</p>
+        </div>
+      )}
     </div>
   );
 };

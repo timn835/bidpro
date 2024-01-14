@@ -4,8 +4,8 @@ import { headers } from "next/headers";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
-  console.log("we are here");
   const body = await request.text();
+  console.log("body is:", body);
   const signature = headers().get("Stripe-Signature") ?? "";
 
   let event: Stripe.Event;

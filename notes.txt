@@ -1,0 +1,5 @@
+Prisma notes:
+npx prisma init # initializes by creating schema.prisma file, only do this once
+npx prisma db push # updates schema changes to db
+npx prisma generate # generates the new typescript types from prisma
+npx prisma studio # opens up prisma studio
